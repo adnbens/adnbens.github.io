@@ -1,0 +1,133 @@
+Hecho por el Papá de Alia
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>¿Quién soy? - Juego Familiar</title>
+  <style>
+    /* Paleta cálida */
+    :root {
+      --fondo: #fef8f0;
+      --primario: #d2691e;
+      --secundario: #fff0d9;
+      --texto: #5a3e2b;
+      --borde: #e0c4a8;
+      --sombra: rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--fondo);
+      color: var(--texto);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 2.8em;
+      margin-bottom: 0.2em;
+      color: var(--primario);
+      text-shadow: 1px 1px 1px var(--sombra);
+    }
+
+    p {
+      font-size: 1.2em;
+      margin-bottom: 30px;
+    }
+
+    select, button {
+      font-size: 1.1em;
+      padding: 12px 20px;
+      margin: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--borde);
+      box-shadow: 0 4px 8px var(--sombra);
+      transition: all 0.2s ease;
+    }
+
+    select {
+      background-color: var(--secundario);
+      color: var(--texto);
+    }
+
+    button {
+      background-color: var(--primario);
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #a45113;
+    }
+
+    #personaje {
+      margin-top: 30px;
+      font-size: 1.8em;
+      font-weight: bold;
+      color: var(--primario);
+      background-color: var(--secundario);
+      padding: 20px 30px;
+      border-radius: 16px;
+      box-shadow: 0 6px 12px var(--sombra);
+      display: none;
+      max-width: 90%;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2em;
+      }
+      #personaje {
+        font-size: 1.4em;
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>🎭 ¿Quién soy?</h1>
+  <p>Elige una categoría y genera un personaje secreto. ¡Solo los demás pueden verlo!</p>
+
+  <select id="categoria">
+    <option value="dibujos">🧸 Dibujos Animados</option>
+    <option value="peliculas">🎬 Películas y Disney</option>
+    <option value="superheroes">🦸 Superhéroes</option>
+    <option value="videojuegos">🎮 Videojuegos</option>
+    <option value="famosos">⭐ Personas Famosas</option>
+    <option value="fantasia">🧙 Fantasía y Otros</option>
+  </select>
+
+  <br>
+  <button onclick="mostrarPersonaje()">🎲 Generar personaje</button>
+
+  <div id="personaje"></div>
+
+  <script>
+    const categorias = {
+      dibujos: ["Mickey Mouse", "Peppa Pig", "Dora la Exploradora", "Bob Esponja", "Finn", "Jake", "Bluey", "Pocoyó"],
+      peliculas: ["Elsa", "Anna", "Olaf", "Simba", "Woody", "Buzz Lightyear", "Moana", "Bella", "Aladdín"],
+      superheroes: ["Batman", "Superman", "Iron Man", "Spider-Man", "Thor", "Wonder Woman", "Pantera Negra"],
+      videojuegos: ["Mario", "Luigi", "Peach", "Yoshi", "Link", "Zelda", "Sonic", "Steve (Minecraft)", "Pikachu"],
+      famosos: ["Messi", "Taylor Swift", "Einstein", "Frida Kahlo", "Michael Jackson", "Elon Musk"],
+      fantasia: ["Santa Claus", "Hada de los Dientes", "Drácula", "Campanita", "Peter Pan", "Sherlock Holmes"]
+    };
+
+    function mostrarPersonaje() {
+      const seleccion = document.getElementById("categoria").value;
+      const lista = categorias[seleccion];
+      const personaje = lista[Math.floor(Math.random() * lista.length)];
+
+      const div = document.getElementById("personaje");
+      div.style.display = "block";
+      div.textContent = "👀 Personaje secreto: " + personaje;
+
+      setTimeout(() => {
+        div.textContent = "🙈 ¡Oculta al jugador!";
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
