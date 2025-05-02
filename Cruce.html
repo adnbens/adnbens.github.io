@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comparador TME vs BALEARIA</title>
+
+  <!-- Estilos CSS para dar formato a la página -->
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0fafa;
+      color: #2f4f4f;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #408285;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    input[type="file"] {
+      margin: 10px 0;
+    }
+
+    button {
+      background-color: #408285;
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      cursor: pointer;
+      margin-right: 10px;
+      border-radius: 15px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #32696b;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #a9d2d3;
+    }
+
+    .section {
+      margin-top: 40px;
+    }
+
+    .section h2 {
+      border-bottom: 2px solid #408285;
+      padding-bottom: 5px;
+      color: #408285;
+    }
+
+    /* Alerta visual si hay documentos duplicados */
+    #duplicityAlert {
+      display: none;
+      color: white;
+      background-color: #e63946;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+
+    /* Tabla de documentos duplicados */
+    #duplicityDocs {
+      display: none;
+      margin-top: 20px;
+    }
+
+    #duplicityDocs table {
+      margin-top: 10px;
+    }
+
+
+  <style>
+  /* Estilo base para el modo claro */
+  body {
+    background-color: #fff;
+    color: #333;
+    font-family: Arial, sans-serif;
+  }
+
+  /* Modo oscuro */
+  body.dark-mode {
+    background-color: #121212;
+    color: #f1f1f1;
+  }
+
+  /* Color corporativo en ambos modos */
+  .section h2 {
+    color: #408285;
+  }
+
+  /* Fondo del botón y bordes en modo oscuro */
+  body.dark-mode button {
+    background-color: #408285;
+    color: white;
+  }
+
+  /* Estilos del switch (interruptor) */
+  #themeSwitch {
+    transform: scale(1.2);
+  }
+
+  /* Ajuste de tablas para ambos modos */
+  table, th, td {
+    border: 1px solid #408285;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 8px;
+    text-align: left;
+  }
+
+  /* Cabeceras de tabla en modo oscuro con color corporativo */
+  body.dark-mode th {
+    background-color: #408285;
+    color: white; /* cambiar a un color más visible si es necesario */
+  }
+
+  /* Ajustes adicionales de las tablas */
+  body.dark-mode table {
+    background-color: #333;
+  }
+
+  body.dark-mode th, body.dark-mode td {
+    color: #f1f1f1;
+    border-color: #408285;
+  }
+
+/* creo el botón de ayuda flotante */
+#helpButton {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #007BFF;
+  color: white;
+  font-size: 20px;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+  text-decoration: none;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 999;
+}
+
+#helpButton:hover {
+  background-color: #0056b3;
+}
+
+
+
+
+#help-icon {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background-color: #408285;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 40px;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 1000;
+    transition: background-color 0.3s;
+  }
+
+  #help-icon:hover {
+    background-color: #306866;
+  }
+</style>
+</head>
+
+
+<body>
+  <div class="container">
+    <h1>Cruce de archivos BALEARIA y TME  - 😉  Cortesía de "Adnane"</h1>
+
+<!-- Contenedor con estilo flex -->
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 18px; margin-top: 10px; color: #408285;">
+  <div id="datetime"></div>
+  <div><strong>Comparaciones realizadas:</strong> <span id="contador">0</span></div>
+</div>
+
+<!-- Contenedor general con Flexbox -->
+<div style="margin: 20px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+
+  <!-- Grupo izquierdo: Switch + botón de reinicio -->
+  <div style="display: flex; gap: 10px; align-items: center;">
+    <!-- Switch Modo Oscuro -->
+    <div style="background-color: #408285; padding: 10px 20px; border-radius: 15px; display: inline-flex; align-items: center; color: white; font-weight: bold; font-size: 16px;">
+      <label for="themeSwitch" style="color: white;">Modo Oscuro</label>
+      <input type="checkbox" id="themeSwitch" style="margin-left: 10px; transform: scale(1.1); cursor: pointer;">
+    </div>
+    <!-- Botón Empezar de nuevo -->
+    <button id="resetBtn">🔄 Empezar de nuevo</button>
+  </div>
+
+  <!-- Grupo derecho: Botones de carga -->
+  <div style="display: flex; gap: 10px;">
+    <!-- Input oculto para cargar el archivo de TME -->
+    <input type="file" id="tmeFile" accept=".xlsx" style="display: none;" onchange="handleFile('tme')" />
+    <button onclick="document.getElementById('tmeFile').click()">Cargar TME.xlsx</button>
+    <!-- Input oculto para cargar el archivo de Balearia -->
+    <input type="file" id="baleariaFile" accept=".csv" style="display: none;" onchange="handleFile('balearia')" />
+    <button onclick="document.getElementById('baleariaFile').click()">Cargar BALEARIA.csv</button>
+  </div>
+
+</div>
+
+
+   <!-- Mensaje de advertencia por duplicados, se muestra solo si se detectan -->
+<div id="duplicityAlert">⚠️ Hay duplicidad de documentos en TME</div>
+
+    <!-- Botón para ejecutar la comparación, aparece tras cargar ambos archivos -->
+    <button id="compareBtn" onclick="processComparison()" style="display:none; margin-top: 10px;">Cruzar Datos</button>
+
+    <!-- Sección que muestra los documentos duplicados en TME -->
+      <div id="duplicityDocs">
+        <h2>Documentos duplicados en TME</h2>
+        <table id="duplicityTable">
+          <thead>
+            <tr>
+              <th>Documento</th>
+              <th>Nombre completo</th>
+              <th>TTEE</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    
+    <!-- Sección 1: Documentos presentes en TME pero no en Balearia -->
+    <div class="section">
+      <h2>Pasajeros y vehículos leídos por TME y no por BALEARIA</h2>
+      <table id="tme-docs-missing">
+        <thead>
+          <tr>
+            <th>Documento</th>
+            <th>Nombre Completo</th>
+            <th>TTEE</th>
+            <th>Bonificación</th>
+            <th>Embarque</th>
+            <th>Tipo de Acceso</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Sección 2: Documentos presentes en Balearia pero no en TME -->
+    <div class="section">
+      <h2>Pasajeros leídos por BALEARIA y no por TME</h2>
+      <table id="bal-not-in-tme">
+        <thead>
+          <tr>
+            <th>Documento</th>
+            <th>Nombre</th>
+            <th>Apellidos</th>
+            <th>TTEE</th>
+            <th>Bonificación</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Sección 3: Documentos presentes en col15 de Balearia que no están en TME -->
+    <div class="section" id="bal-doc15-not-in-tme-section">
+      <h2>Vehículos leídos por BALEARIA y no por TME</h2>
+        <table id="bal-doc15-not-in-tme">
+          <thead>
+            <tr>
+              <th>Matrícula</th>
+              <th>Marca</th>
+              <th>Modelo</th>
+              <th>Documento</th>
+              <th>Nombre</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+    </div>
+
+    <button onclick="window.print()" style="margin: 10px 0; background-color: #4CAF50; color: white; border: none; padding: 10px; border-radius: 5px;">📄 Guardar como PDF</button>
+
+  </div>
+<!-- Cargamos la librería XLSX para poder leer archivos Excel (.xlsx) -->
+<script src="js/xlsx.full.min.js"></script>
+<script>
+  // Variables para guardar los datos extraídos de los archivos TME y BALEARIA
+  let tmeData = [];
+  let baleariaData = [];
+
+  // Función para manejar la carga de archivos
+  function handleFile(type) {
+    // Obtenemos la referencia al input correspondiente (TME o BALEARIA)
+    const fileInput = document.getElementById(type === 'tme' ? 'tmeFile' : 'baleariaFile');
+    const file = fileInput.files[0];
+    
+    // Si no se seleccionó archivo, mostramos un mensaje de alerta
+    if (!file) return alert(`Seleccione el archivo ${type === 'tme' ? 'TME.xlsx' : 'BALEARIA.csv'}`);
+
+    const reader = new FileReader(); // Creamos un lector de archivos
+
+    // Cuando el archivo esté leído:
+    reader.onload = (e) => {
+      const data = e.target.result;
+
+      if (type === 'tme') {
+        // Procesamos archivo XLSX usando la librería XLSX
+        const workbook = XLSX.read(data, { type: 'binary' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        tmeData = XLSX.utils.sheet_to_json(sheet, { header: 1 }).slice(1); // Convertimos a array y quitamos encabezado
+        checkDuplicityTME(); // Verificamos duplicados en TME
+      } else {
+        // Procesamos archivo CSV (BALEARIA), dividiendo por líneas y luego por punto y coma
+        baleariaData = data.split(/\r?\n/).map(row => row.split(';')).slice(1); // Quitamos encabezado
+      }
+
+      // Si ambos archivos están cargados, mostramos el botón para comparar
+      if (tmeData.length && baleariaData.length) {
+        //document.getElementById("compareBtn").style.display = "inline-block";
+
+        // ejecuto el cruce automáticamente, anulo la linea anterior
+        processComparison();
+      }
+    };
+
+    // Leemos el archivo dependiendo del tipo
+    type === 'tme' ? reader.readAsBinaryString(file) : reader.readAsText(file);
+  }
+
+  // Función para limpiar datos: quita espacios, guiones, ceros a la izquierda y convierte a mayúsculas
+  function clean(str) {
+    return str ? str.toString().replace(/[-\s]/g, '').replace(/^0+/, '').toUpperCase() : '';
+  }
+
+  function checkDuplicityTME() {
+  const seen = new Map(); // Mapa para verificar duplicados
+  const duplicityRows = [];
+
+  for (let i = 0; i < tmeData.length; i++) {
+    const row = tmeData[i];
+    const doc = clean(row[4]); // Normalizamos documento (columna 5)
+
+    if (doc) {
+      if (seen.has(doc)) {
+        // Si ya lo vimos antes y aún no lo hemos agregado, agregamos el primero
+        const firstIndex = seen.get(doc);
+        if (firstIndex !== null) {
+          duplicityRows.push(tmeData[firstIndex]); // Agrega la primera vez que apareció
+          seen.set(doc, null); // Marcamos como ya añadido para no duplicarlo de nuevo
+        }
+        duplicityRows.push(row); // Agrega la fila actual
+      } else {
+        seen.set(doc, i); // Guardamos el índice de la primera aparición
+      }
+    }
+  }
+
+
+  // Mostrar u ocultar el mensaje
+  const alertDiv = document.getElementById("duplicityAlert");
+  alertDiv.style.display = duplicityRows.length > 0 ? "block" : "none";
+
+  // Mostrar u ocultar la sección y rellenar la tabla
+  const duplicitySection = document.getElementById("duplicityDocs");
+  const tbody = document.querySelector("#duplicityTable tbody");
+  tbody.innerHTML = "";
+
+  if (duplicityRows.length > 0) {
+    duplicitySection.style.display = "block";
+    duplicityRows.forEach(row => {
+      const tr = `<tr>
+        <td>${clean(row[4])}</td>
+        <td>${row[9]}</td>
+        <td>${row[1]}</td>
+      </tr>`;
+      tbody.innerHTML += tr;
+    });
+  } else {
+    duplicitySection.style.display = "none";
+  }
+}
+
+ // Función principal que compara los datos entre TME y BALEARIA(La madre del cordero)
+function processComparison() {
+  // Oculta el botón después de hacer clic
+  //document.getElementById('compareBtn').style.display = 'none';
+  
+  // Conjuntos de documentos y matrículas normalizados
+  const tmeDocs = new Set(tmeData.filter(r => r[4] && !r[4].includes('-')).map(r => clean(r[4])));
+  const balDocs = new Set(baleariaData.map(r => clean(r[5])));
+  const balMats = new Set(baleariaData.map(r => clean(r[14])));
+
+  // 🟠 Documentos en BALEARIA que no están en TME
+  document.querySelector('#bal-not-in-tme tbody').innerHTML = '';
+  baleariaData.forEach(row => {
+    const doc = clean(row[5]);
+    if (doc && !tmeDocs.has(doc)) {
+      const bonificado = parseInt(row[24]) < 99 ? 'Bonificado' : '';
+      const tr = `<tr><td>${row[5]}</td><td>${row[2]}</td><td>${row[3]}</td><td>${row[21]}</td><td>${bonificado}</td></tr>`;
+      document.querySelector('#bal-not-in-tme tbody').innerHTML += tr;
+      tmeDocs.add(doc); // Añadimos para evitar duplicados en la tabla
+    }
+  });
+
+  // 🟠 Documentos en TME que no están en BALEARIA (comparando con documento y columna 15)
+  document.querySelector('#tme-docs-missing tbody').innerHTML = '';
+
+  // Creamos un nuevo Set que contiene la columna 6 y columna 15 de BALEARIA
+  const balExtraDocs = new Set();
+  baleariaData.forEach(r => {
+    balExtraDocs.add(clean(r[5]));  // Columna 6 (índice 5)
+    balExtraDocs.add(clean(r[14])); // Columna 15 (índice 14)
+  });
+
+  tmeData.forEach(row => {
+    const doc = clean(row[4]);
+    if (doc && !balExtraDocs.has(doc)) {
+      const bonificado = parseInt(row[12]) < 99 ? 'Bonificado' : '';
+      // Formateamos la fecha en la última columna
+      const rawDate = row[5]; // La fecha está en la columna 6
+      const formattedDate = formatDate(rawDate); // Llamamos a la función de formateo
+      const tr = `<tr><td>${row[4]}</td><td>${row[9]}</td><td>${row[1]}</td><td>${bonificado}</td><td>${formattedDate}</td><td>${row[3]}</td></tr>`;
+      document.querySelector('#tme-docs-missing tbody').innerHTML += tr;
+      balExtraDocs.add(doc); // Añadimos para evitar duplicados
+    }
+  });
+
+  // 🟠 Documentos en la columna 15 de BALEARIA que no están en la columna 5 de TME
+  document.querySelector('#bal-doc15-not-in-tme tbody').innerHTML = '';
+  const tmeDocCleaned = new Set(tmeData.map(r => clean(r[4])));
+  const alreadyShown = new Set(); // Para evitar mostrar duplicados
+
+  baleariaData.forEach(row => {
+    const doc15 = clean(row[14]);
+    if (doc15 && !tmeDocCleaned.has(doc15) && !alreadyShown.has(doc15)) {
+      const tr = `<tr><td>${row[14]}</td><td>${row[15]}</td><td>${row[16]}</td><td>${row[5]}</td><td>${row[2]} - ${row[3]}</td></tr>`;
+      document.querySelector('#bal-doc15-not-in-tme tbody').innerHTML += tr;
+      alreadyShown.add(doc15);
+    }
+  });
+
+  aumentarContador();
+}
+
+// Función para formatear la fecha en el formato deseado "HH:mm dd/MM/yy"
+function formatDate(dateString) {
+  const date = new Date(dateString); // Creamos un objeto Date con el valor de la fecha
+  const hours = date.getHours().toString().padStart(2, '0'); // Horas con 2 dígitos
+  const minutes = date.getMinutes().toString().padStart(2, '0'); // Minutos con 2 dígitos
+  const day = date.getDate().toString().padStart(2, '0'); // Día con 2 dígitos
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Mes con 2 dígitos (los meses empiezan desde 0)
+  const year = date.getFullYear().toString().slice(-2); // Año con los últimos 2 dígitos
+  
+  return `${hours}:${minutes} ${day}/${month}/${year}`; // Devolvemos el formato "HH:mm dd/MM/yy"
+}
+
+
+  function updateDateTime() {
+    const now = new Date();
+
+    const options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    };
+
+    const formattedDate = now.toLocaleDateString('es-ES', options);
+
+    document.getElementById('datetime').innerText = `📅 ${formattedDate}`;
+  }
+
+// Función para cambiar el tema (claro u oscuro)
+document.getElementById('themeSwitch').addEventListener('change', function() {
+  // Cambia el tema dependiendo del estado del interruptor
+  if (this.checked) {
+    document.body.classList.add('dark-mode');
+  } else {
+    document.body.classList.remove('dark-mode');
+  }
+});
+
+// Establecer el tema inicial según el preferencia del usuario o el estado guardado
+if (localStorage.getItem('theme') === 'dark') {
+  document.body.classList.add('dark-mode');
+  document.getElementById('themeSwitch').checked = true;
+} else {
+  document.body.classList.remove('dark-mode');
+  document.getElementById('themeSwitch').checked = false;
+}
+
+// Guardar el tema en localStorage para recordar la preferencia del usuario
+document.getElementById('themeSwitch').addEventListener('change', function() {
+  localStorage.setItem('theme', this.checked ? 'dark' : 'light');
+});
+
+  document.getElementById('resetBtn').addEventListener('click', function() {
+    // Limpia la preferencia del tema si quieres "empezar de cero"
+    //localStorage.removeItem("theme");
+    location.reload(); // Recarga la página completamente
+  });
+
+  // Obtener el contador actual de localStorage (o iniciar en 0)
+  let ejecuciones = localStorage.getItem("contadorComparacion") || 0;
+
+  // Aumentar el contador en cada carga (o cuando se ejecute tu función de comparación)
+  function aumentarContador() {
+    ejecuciones++;
+    localStorage.setItem("contadorComparacion", ejecuciones);
+    document.getElementById("contador").textContent = ejecuciones;
+  }
+
+  // Mostrar el contador en la página al cargar
+  document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("contador").textContent = ejecuciones;
+  });
+
+  setInterval(updateDateTime, 1000); // Actualiza cada segundo
+  updateDateTime(); // Llama una vez al cargar la página
+
+</script>
+
+<a href="Hepl/Ayuda.html" target="_blank" id="helpButton" title="Ayuda">
+  ❔
+</a>
+
+<!-- Ícono de Ayuda -->
+<a href="Help/Ayuda.html" target="_blank" title="Ver ayuda">
+  <div id="help-icon">?</div>
+</a>
+
+
+<footer style="text-align: center; margin-top: 20px; font-size: 14px; color: #408285;">
+    &copy; 2025 - Herramienta de Cruce de Datos por "Adnane Bensliman"
+</footer>
+
+</body>
+</html>
