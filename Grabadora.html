@@ -49,9 +49,15 @@
       width: 90%;
       max-width: 400px;
     }
+    #descargaTexto {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #333;
+      display: none;
+    }
     #downloadLink {
       display: none;
-      margin-top: 15px;
+      margin-top: 10px;
       color: #408285;
       font-weight: bold;
       text-decoration: none;
@@ -76,6 +82,8 @@
 
   <h2>Reproducción:</h2>
   <audio id="audioPlayer" controls></audio>
+
+  <p id="descargaTexto">⬇️ Cuando grabe la nota, descárguela para que se guarde</p>
   <a id="downloadLink" href="#" download="nota-de-voz.mp4">⬇️ Descargar Nota</a>
 
   <script>
@@ -85,6 +93,7 @@
     const stopBtn = document.getElementById("stopBtn");
     const audioPlayer = document.getElementById("audioPlayer");
     const downloadLink = document.getElementById("downloadLink");
+    const descargaTexto = document.getElementById("descargaTexto");
 
     let mediaRecorder;
     let audioChunks = [];
@@ -102,13 +111,26 @@
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         audioChunks = [];
 
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioContext.createMediaStreamSource(stream);
+
+        // Crear un GainNode y aumentar la ganancia
+        const gainNode = audioContext.createGain();
+        gainNode.gain.value = 3; // Ajusta la ganancia (puedes experimentar con este valor)
+
+        // Conectar el GainNode al destino (output)
+        source.connect(gainNode);
+        const destination = audioContext.createMediaStreamDestination();
+        gainNode.connect(destination);
+
+        // Definir el tipo de archivo y crear el MediaRecorder
         const mimeType = isSafari
           ? 'audio/mp4'
           : MediaRecorder.isTypeSupported('audio/webm')
             ? 'audio/webm'
             : 'audio/ogg';
 
-        mediaRecorder = new MediaRecorder(stream, { mimeType });
+        mediaRecorder = new MediaRecorder(destination.stream, { mimeType });
 
         mediaRecorder.ondataavailable = event => {
           if (event.data.size > 0) audioChunks.push(event.data);
@@ -122,12 +144,16 @@
           downloadLink.href = audioURL;
           downloadLink.download = `nota-de-voz.${mimeType.split('/')[1]}`;
           downloadLink.style.display = 'inline-block';
+          descargaTexto.style.display = 'block';
         };
 
         mediaRecorder.start();
         startBtn.disabled = true;
         stopBtn.disabled = false;
         mensaje.innerText = "🎙️ Grabando...";
+        descargaTexto.style.display = 'none';
+        downloadLink.style.display = 'none';
+        audioPlayer.src = '';
       } catch (err) {
         mensaje.innerText = "Error: " + err.message;
       }
