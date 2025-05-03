@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Control de Buques</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f7f8;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #408285;
+      font-size: 2rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .select-group {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    select {
+  flex: 1;
+  min-width: 150px;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  background-color: #408285;  /* Fondo de color corporativo */
+  color: #fff; /* Cambia el color del texto a blanco para asegurar buena visibilidad */
+}
+
+    .upload-download {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .upload-download button {
+      flex: 0 0 auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #408285;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .upload-download button:hover {
+      background-color: #326b6b;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    .buttons button {
+      flex: 1 1 calc(33.333% - 20px);
+      min-width: 100px;
+      margin: 5px;
+      padding: 15px;
+      font-size: 16px;
+      background-color: #408285;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .buttons button:hover {
+      background-color: #326b6b;
+    }
+
+    button.pulsado {
+      background-color: #4CAF50 !important; 
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .separator {
+      border-top: 2px solid #408285;
+      margin: 20px 0;
+    }
+
+    .dropdown-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dropdown-container select {
+      width: 120px;
+    }
+
+    .dropdownBis-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dropdownBis-container select {
+      width: 120px;
+    }
+
+    @media (max-width: 768px) {
+      .select-group {
+        flex-direction: column;
+      }
+
+      select {
+        width: 100%;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+
+      .buttons button {
+        flex: 1 1 100%;
+      }
+
+      .upload-download {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .container {
+        padding: 20px;
+      }
+
+      .buttons button {
+        font-size: 14px;
+        padding: 12px;
+      }
+    }
+
+.btn-reload {
+  background-color: #408285;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1em;
+  border-radius: 8px;
+  /*margin-top: 10px;*/
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-reload:hover {
+  background-color: #30625f;
+}
+#uploadBtn.success {
+  background-color: #4CAF50; /* Verde */
+  color: white;
+}
+#reloadBtn {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #408285;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.modo-oscuro {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
+
+.modo-oscuro .container {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+.modo-oscuro select {
+  background-color: #408285;
+  color: #fff;
+  border-color: #666;
+}
+
+.modo-oscuro .upload-download button,
+.modo-oscuro .buttons button,
+.modo-oscuro #reloadBtn,
+.modo-oscuro #uploadBtn.success {
+  background-color: #408285;
+  color: white;
+}
+
+.modo-oscuro .separator {
+  border-top-color: #408285;
+}
+.modo-oscuro #uploadBtn.success {
+  background-color: #4CAF50 !important;
+  color: white;
+}
+
+  :root {
+    --primary-color: #408285; /* Color corporativo */
+    --accent-color: #eaf5f5;  /* Versión clara del color para alternar filas */
+    --text-color: #1a1a1a;
+  }
+
+  #tablaResumen1,#tablaResumen2 {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-top: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+#tablaResumen1 thead,
+#tablaResumen2 thead {
+  background-color: var(--primary-color); /* Color corporativo */
+  color: white;
+  text-align: center;
+  font-size: 15px;
+}
+
+
+#tablaResumen1 th,
+#tablaResumen2 th,
+#tablaResumen1 td,
+#tablaResumen2 td {
+
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+
+#tablaResumen1 tbody tr,
+#tablaResumen2 tbody tr {
+  background-color: #000; /* Fondo negro */
+}
+
+#tablaResumen1 tbody tr,
+#tablaResumen2 tbody tr {
+  background-color: inherit; /* Hereda el color del contenedor */
+}
+
+  h3 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--primary-color);
+    margin-top: 30px;
+  }
+.responsive-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+@media screen and (max-width: 768px) {
+  #tablaResumen1,
+  #tablaResumen2 {
+    display: block;
+    width: 100%;
+  }
+
+  #tablaResumen1 thead,
+  #tablaResumen2 thead {
+    font-size: 14px;
+  }
+
+  #tablaResumen1 td,
+  #tablaResumen2 td {
+    font-size: 13px;
+    padding: 8px;
+  }
+}
+.logo-balearia {
+      background-color: #408285; /* color corporativo */
+      color: white;
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: 36px;
+      padding: 10px 30px;
+      display: inline-block;
+      border-radius: 4px; /* opcional, para suavizar */
+      letter-spacing: 2px;
+      transform: skew(-10deg);/* inclinación forzada */
+    }
+    .logo-container {
+      background-color: #408285; /* color corporativo */
+      display: inline-block;
+      padding: 10px 30px;
+      border-radius: 4px;
+    }
+
+    .logo-text {
+      color: white;
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: 16px;
+      letter-spacing: 2px;
+      display: inline-block;
+      transform: skew(-10deg); /* solo el texto */
+    }
+    .header {
+  display: flex;
+  align-items: center; /* Alinea verticalmente */
+  justify-content: center; /* Centra horizontalmente todo el grupo */
+  gap: 20px; /* Espacio entre logo y título */
+  flex-wrap: wrap; /* Para que no se rompa en pantallas pequeñas */
+  margin-bottom: 20px;
+}
+
+.app-title {
+  margin: 0;
+}
+.tabla-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabla-scroll table {
+  width: 100%;
+  min-width: 600px; /* Ajusta si necesitas más o menos ancho mínimo */
+  border-collapse: collapse;
+}
+
+table th, table td {
+  padding: 8px;
+  text-align: center;
+}
+.columna-total {
+  background-color: #ffeeba;
+  font-weight: bold;
+  color: #1b4332;
+}
+
+
+
+
+
+body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+      background: #f5f5f5;
+    }
+
+    .calculadora {
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      padding: 1rem;
+      background: #408285;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    #display {
+  width: 320px;
+  font-size: 2rem;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  text-align: right;
+}
+
+
+    .btnCalc {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+
+
+.btnCalc button {
+      flex: 1 1 calc(33.333% - 20px);
+      min-width: 100px;
+      margin: 5px;
+      padding: 15px;
+      font-size: 16px;
+      background-color: #1e1e1e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btnCalc button:hover {
+      background-color: #326b6b;
+    }
+
+
+
+
+    #resultado {
+      font-size: 1.2rem;
+      margin-top: 1rem;
+      color: #2c3e50;
+    }
+</style>
+</head>
+
+
+<body>
+  <div class="container">
+    <div class="header">
+    <div class="logo-container">
+    <span class="logo-text">BALEARIA</span>
+  </div>
+<h1 class="app-title">  Control de Buques</h1>  
+  
+
+<div class="barco-icon">
+    <!-- SVG Barco mejorado -->
+    <svg viewBox="0 0 128 64" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+      <g fill="#ffffff">
+        <!-- Casco del barco -->
+        <path d="M10 40 Q64 60 118 40 L110 50 Q64 68 18 50 Z" />
+        
+        <!-- Cabina -->
+        <rect x="45" y="20" width="38" height="12" rx="2" />
+        
+        <!-- Chimenea -->
+        <rect x="58" y="10" width="12" height="10" rx="1" />
+        
+        <!-- Ventanas -->
+        <circle cx="52" cy="26" r="2" />
+        <circle cx="58" cy="26" r="2" />
+        <circle cx="64" cy="26" r="2" />
+        <circle cx="70" cy="26" r="2" />
+        <circle cx="76" cy="26" r="2" />
+      </g>
+    </svg>
+  </div>
+
+
+  </div>  
+    <div class="select-group">
+      <select id="buque">
+        <option value="">Selecciona un buque</option>
+        <option value="Avemar Dos">Avemar Dos</option>
+        <option value="Jaume I">Jaume I</option>
+      </select>
+
+      <select id="horaSalida">
+        <option value="">Selecciona hora de salida</option>
+      </select>
+    </div>
+<div class="separator"></div>
+    <div class="upload-download">
+      <input type="file" id="fileInput" accept=".xlsx" />
+      <button id="uploadBtn">Subir Archivo</button>
+      <button id="downloadBtn">Descargar Archivo</button>
+      <button id="reloadBtn" class="btn-reload">Recargar Página</button>
+      <button id="modoOscuroBtn">Cambiar a Modo Oscuro</button>
+    </div>
+
+    <div class="separator"></div>
+<div style="margin-top: 15px; font-size: 1.1rem; font-weight: bold; color: #408285;">
+  Control de Autos
+</div>
+
+    <div class="dropdown-container">
+      <select id="PAX"></select>
+      <select id="BEBES"></select>
+      <select id="CHF"></select>
+      <select id="VEH"></select>
+      <select id="FURG"></select>
+      <select id="CRV"></select>
+      <select id="MOT"></select>
+      <select id="REM"></select>
+      <select id="BUS"></select>
+      <select id="OTROS"></select>
+    </div>
+<div class="separator"></div>
+<div style="margin-top: 15px; font-size: 1.1rem; font-weight: bold; color: #408285;">
+  Control de Pasaje
+</div>
+<div class="dropdownBis-container">
+      <select id="PASAJEROS"></select>
+      <select id="BEBE"></select>
+    </div>
+
+<div class="separator"></div>
+
+
+
+    <div class="buttons" id="buttonsContainer"></div>
+    <div class="separator"></div>
+   <h3>Resumen de selección</h3>
+
+<div class="tabla-scroll">
+  <table id="tablaResumen1">
+    <thead>
+      <tr>
+        <th>P.Aut</th>
+        <th>P.Pas</th>
+        <th>Beb.Aut</th>
+        <th>Beb.Pas</th>
+        <th>Total PAX</th>
+        <th>Total Bebés</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr id="filaResumen1">
+        <!-- Los datos se insertarán aquí -->
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="tabla-scroll">
+  <table id="tablaResumen2">
+    <thead>
+      <tr>
+        <th>Ch</th>
+        <th>Vh</th>
+        <th>Fr</th>
+        <th>Cv</th>
+        <th>Mt</th>
+        <th>Rm</th>
+        <th>Bus</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr id="filaResumen2">
+        <!-- Los datos se insertarán aquí -->
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="separator"></div>
+<h3>Sumadora</h3>
+<div class="calculadora">
+    <input type="text" id="display" readonly />
+    <div class="btnCalc" id="btnCalc-container">
+      <!-- Botones generados por JS -->
+    </div>
+  </div>
+
+
+
+  <script>
+    const horas = [];
+    for (let i = 0; i < 24; i++) {
+      const hora = i.toString().padStart(2, '0') + "h00";
+      horas.push(hora);
+    }
+
+    const horaSalidaSelect = document.getElementById('horaSalida');
+    horas.forEach(h => {
+      const option = document.createElement('option');
+      option.value = h;
+      option.textContent = h;
+      horaSalidaSelect.appendChild(option);
+    });
+
+    /// Función para llenar las listas de 0 a 1000, con un valor por defecto
+function llenarSelect(id) {
+  const select = document.getElementById(id);
+
+  // Agregamos opción por defecto con el mismo nombre que el id
+  const defaultOption = document.createElement('option');
+  defaultOption.value = "";
+  defaultOption.textContent = id;
+  defaultOption.disabled = true;
+  defaultOption.selected = true;
+  select.appendChild(defaultOption);
+
+  // Luego agregamos los números del 0 al 1000
+  for (let i = 0; i <= 1000; i++) {
+    const option = document.createElement('option');
+    option.value = i;
+    option.textContent = i;
+    select.appendChild(option);
+  }
+}
+
+    // Llenamos todos los selects
+    const selectIds = ["PAX", "BEBES", "CHF", "VEH", "FURG", "CRV", "MOT", "REM", "BUS", "OTROS","PASAJEROS","BEBE"];
+    selectIds.forEach(id => llenarSelect(id));
+
+    const botonesContainer = document.getElementById('buttonsContainer');
+    let workbook;
+    let fileName = '';
+    let pasosRealizados = [];
+
+    const nombresBotones = ["P. Estacha", "Bajada", "Fin Descarga", "Fin Carga", "Subida","U. Estacha"];
+
+    for (let i = 0; i < nombresBotones.length; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = nombresBotones[i];
+      btn.onclick = () => escribirHora(i, btn);
+      botonesContainer.appendChild(btn);
+    }
+
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        workbook = XLSX.read(data, { type: 'array' });
+
+      // ✅ Cambiar color del botón al cargarse correctamente
+    document.getElementById('uploadBtn').classList.add('success');
+
+        fileName = document.getElementById('fileInput').files[0].name;
+        pasosRealizados = [];
+        document.querySelectorAll('.buttons button').forEach(btn => btn.classList.remove('pulsado'));
+      };
+      reader.readAsArrayBuffer(e.target.files[0]);
+    });
+
+    document.getElementById('uploadBtn').addEventListener('click', function() {
+      document.getElementById('fileInput').click();
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', descargarArchivo);
+
+    function escribirHora(index, btn) {
+      if (!workbook) {
+        alert("Primero carga un archivo.");
+        return;
+      }
+
+      if (pasosRealizados.length !== index) {
+        alert(`Debes pulsar primero el botón ${pasosRealizados.length + 1}`);
+        return;
+      }
+
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const now = new Date();
+      const hora = now.getHours() + ':' + 
+             now.getMinutes().toString().padStart(2, '0') + ':' + 
+             now.getSeconds().toString().padStart(2, '0');
+
+      const fecha = now.toLocaleDateString();
+      const buque = document.getElementById('buque').value;
+      const horaSalida = document.getElementById('horaSalida').value;
+
+      if (!buque || !horaSalida) {
+        alert("Selecciona el Buque y la Hora de Salida antes de registrar.");
+        return;
+      }
+
+      const colLetter = String.fromCharCode(65 + index); 
+      let fila = 2;
+
+      while (sheet[`${colLetter}${fila}`] && sheet[`${colLetter}${fila}`].v !== "") {
+        fila++;
+      }
+
+      const celdaHora = `${colLetter}${fila}`;
+      sheet[celdaHora] = { v: hora, t: 's' };
+      sheet[`G${fila}`] = { v: fecha, t: 's' };
+      sheet[`H${fila}`] = { v: buque, t: 's' };
+      sheet[`I${fila}`] = { v: horaSalida, t: 's' };
+
+// Obtener los valores de las listas "PAX", "PASAJEROS", "BEBES" y "BEBE"
+  const paxValue = parseInt(document.getElementById('PAX').value || 0);
+  const pasajerosValue = parseInt(document.getElementById('PASAJEROS').value || 0);
+  const bebesValue = parseInt(document.getElementById('BEBES').value || 0);
+  const bebeValue = parseInt(document.getElementById('BEBE').value || 0);
+
+  // Sumar "PAX" + "PASAJEROS" y "BEBES" + "BEBE"
+  const totalPax = paxValue + pasajerosValue;
+  const totalBebes = bebesValue + bebeValue;
+
+  const columnasPasajeros = ["J", "K", "L", "M", "N", "O", "P", "Q", "R", "S","T","U"];
+selectIds.forEach((id, idx) => {
+  const valor = document.getElementById(id).value || 0;
+  const col = columnasPasajeros[idx];
+  sheet[`${col}${fila}`] = { v: parseInt(valor), t: 'n' };
+});
+
+
+      const ref = XLSX.utils.decode_range(sheet['!ref'] || "A1:U2");
+      if (ref.e.c < 8) ref.e.c = 8;
+      if (fila - 1 > ref.e.r) ref.e.r = fila - 1;
+      sheet['!ref'] = XLSX.utils.encode_range(ref);
+
+      pasosRealizados.push(index);
+      btn.classList.add("pulsado");
+    }
+
+// Función para actualizar valores de desplegables
+function actualizarValoresDesplegables() {
+  if (!workbook) return;
+
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+  // Buscar última fila ocupada (lo más abajo que haya algo en la columna A por ejemplo)
+  let fila = 2;
+  while (sheet[`A${fila}`] && sheet[`A${fila}`].v !== "") {
+    fila++;
+  }
+  fila--; // retroceder 1 porque la última comprobada estaba vacía
+
+  if (fila < 2) return; // si no hay datos, no hacemos nada
+
+  const columnasPasajeros = ["J", "K", "L", "M", "N", "O", "P", "Q", "R", "S","T","U"];
+  selectIds.forEach((id, idx) => {
+    const valor = document.getElementById(id).value || 0;
+    const col = columnasPasajeros[idx];
+    sheet[`${col}${fila}`] = { v: parseInt(valor), t: 'n' };
+  });
+}
+   
+    function descargarArchivo() {
+      if (!workbook) {
+        alert("Primero carga un archivo.");
+        return;
+      }
+    actualizarValoresDesplegables(); // <-- Muy importante: antes de guardar
+      const buque = document.getElementById('buque').value;
+      const now = new Date();
+      const fecha = now.toLocaleDateString().split('/').reverse().join('-');
+      const hora = now.getHours().toString().padStart(2, '0') + '-' +
+                   now.getMinutes().toString().padStart(2, '0') + '-' +
+                   now.getSeconds().toString().padStart(2, '0');
+      const nuevoNombre = `${buque}_${fecha}_${hora}.xlsx`;
+
+      const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([wbout], { type: "application/octet-stream" });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = nuevoNombre;
+      link.click();
+    }
+
+    //Recargamos la página
+    document.getElementById('reloadBtn').addEventListener('click', function() {
+  location.reload();
+});
+
+  const btnModoOscuro = document.getElementById('modoOscuroBtn');
+
+  btnModoOscuro.addEventListener('click', () => {
+    const body = document.body;
+    body.classList.toggle('modo-oscuro');
+
+    const enModoOscuro = body.classList.contains('modo-oscuro');
+    btnModoOscuro.textContent = enModoOscuro ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro';
+
+    // Guardar preferencia en localStorage
+    localStorage.setItem('modoOscuro', enModoOscuro);
+  });
+
+  // Al cargar la página, aplicar el modo guardado
+  window.addEventListener('DOMContentLoaded', () => {
+    const modoGuardado = localStorage.getItem('modoOscuro') === 'true';
+    if (modoGuardado) {
+      document.body.classList.add('modo-oscuro');
+      btnModoOscuro.textContent = 'Cambiar a Modo Claro';
+    }
+  });
+
+
+function actualizarResumen() {
+  const fila1 = document.getElementById("filaResumen1");
+  const fila2 = document.getElementById("filaResumen2");
+  fila1.innerHTML = "";
+  fila2.innerHTML = "";
+
+  // Obtiene valores
+  const pax = parseInt(document.getElementById("PAX").value || 0);
+  const pasajeros = parseInt(document.getElementById("PASAJEROS").value || 0);
+  const bebes = parseInt(document.getElementById("BEBES").value || 0);
+  const bebe = parseInt(document.getElementById("BEBE").value || 0);
+
+  // Construye arreglo con orden personalizado:
+  // [PAX, PASAJEROS, Beb.Aut, Beb.Pas, Total PAX, Total Bebés]
+  const datosFila1 = [
+    pax,
+    pasajeros,
+    bebes,
+    bebe,
+    pax + pasajeros,
+    bebes + bebe
+  ];
+
+  datosFila1.forEach((valor,index) => {
+    const td = document.createElement("td");
+    td.textContent = valor;
+
+if (index === 4 || index === 5) {       //Para resaltar las columnas de los totales
+  td.classList.add("columna-total");
+}
+    fila1.appendChild(td);
+  });
+
+  // Fila 2: CHF, VEH, FURG, CRV, MOT, REM, BUS
+  const otrosIds = ["CHF", "VEH", "FURG", "CRV", "MOT", "REM", "BUS"];
+  otrosIds.forEach(id => {
+  const valor = parseInt(document.getElementById(id).value || 0);
+  const td = document.createElement("td");
+  td.textContent = valor;
+  td.classList.add("columna-total"); // Aplica estilo de resaltado
+  fila2.appendChild(td);
+});
+
+}
+
+// Asigna el evento a cada select para que actualice el resumen al cambiar
+const selectIdsResumen = ["PAX", "PASAJEROS", "BEBES", "BEBE", "CHF", "VEH", "FURG", "CRV", "MOT", "REM", "BUS"];
+selectIdsResumen.forEach(id => {
+  const sel = document.getElementById(id);
+  if (sel) sel.addEventListener("change", actualizarResumen);
+});
+
+// También se puede llamar al cargar por primera vez
+document.addEventListener("DOMContentLoaded", actualizarResumen);
+
+
+const display = document.getElementById("display");
+    const btnCalcContainer = document.getElementById("btnCalc-container");
+    const resultado = document.getElementById("resultado");
+
+    let numeros = [];
+    let nuevaEntrada = true; // bandera
+
+    // Crear botones numéricos del 1 al 9
+    for (let i = 1; i <= 9; i++) {
+      crearBoton(i);
+    }
+
+    // Botón 0
+    crearBoton(0);
+
+    // Botón Sumar
+    const btnSumar = document.createElement("button");
+    btnSumar.textContent = "+";
+    btnSumar.onclick = () => {
+  const valor = parseFloat(display.value);
+  if (!isNaN(valor)) {
+    numeros.push(valor);
+    const suma = numeros.reduce((acc, val) => acc + val, 0);
+    display.value = suma; // Mostrar resultado en el display
+    nuevaEntrada = true;
+  }
+};
+
+    btnCalcContainer.appendChild(btnSumar);
+
+    // Botón Limpiar
+    const btnLimpiar = document.createElement("button");
+    btnLimpiar.textContent = "C";
+    btnLimpiar.onclick = () => {
+      display.value = "";
+      numeros = [];
+      resultado.textContent = "Resultado: 0";
+      nuevaEntrada = true;
+    };
+    btnCalcContainer.appendChild(btnLimpiar);
+
+    // Función para crear botón numérico
+    function crearBoton(n) {
+      const btn = document.createElement("button");
+      btn.textContent = n;
+      btn.onclick = () => {
+        if (nuevaEntrada) {
+          display.value = "" + n;
+          nuevaEntrada = false;
+        } else {
+          display.value += n;
+        }
+      };
+      btnCalcContainer.appendChild(btn);
+    }
+  
+
+
+
+
+
+
+</script>
+
+<footer style="text-align: center; font-size: 0.85rem; color: #666; margin-top: 40px; padding-bottom: 10px;">
+  © 2025 Adnane Bensliman. Todos los derechos reservados.<br>
+</footer>
+
+</body>
+</html>
+
+
+
+
+
+    
+  
+
+  
+
+  
+    
