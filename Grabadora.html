@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grabadora de Notas de Voz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      text-align: center;
+      padding: 30px 10px;
+    }
+    .logo-container {
+      background-color: #408285;
+      display: inline-block;
+      padding: 10px 30px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    .logo-balearia {
+      color: white;
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: 25px;
+      letter-spacing: 2px;
+      display: inline-block;
+      transform: skew(-10deg);
+    }
+    h1 {
+      color: #408285;
+      font-size: 22px;
+    }
+    button {
+      background-color: #408285;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #30686a;
+    }
+    audio {
+      display: block;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 400px;
+    }
+    #downloadLink {
+      display: none;
+      margin-top: 15px;
+      color: #408285;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    #mensaje {
+      margin-top: 10px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo-container">
+    <div class="logo-balearia">BALEARIA</div>
+  </div>
+
+  <h1>Grabadora de Notas de Voz</h1>
+
+  <button id="startBtn">🎙️ Comenzar Grabación</button>
+  <button id="stopBtn" disabled>⏹️ Detener</button>
+  <p id="mensaje"></p>
+
+  <h2>Reproducción:</h2>
+  <audio id="audioPlayer" controls></audio>
+  <a id="downloadLink" href="#" download="nota-de-voz.mp4">⬇️ Descargar Nota</a>
+
+  <script>
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const mensaje = document.getElementById("mensaje");
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const audioPlayer = document.getElementById("audioPlayer");
+    const downloadLink = document.getElementById("downloadLink");
+
+    let mediaRecorder;
+    let audioChunks = [];
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      mensaje.innerText = "Tu navegador no soporta acceso al micrófono.";
+      startBtn.disabled = true;
+    } else if (typeof MediaRecorder === "undefined") {
+      mensaje.innerText = "Tu navegador no soporta grabación de audio.";
+      startBtn.disabled = true;
+    }
+
+    startBtn.onclick = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioChunks = [];
+
+        const mimeType = isSafari
+          ? 'audio/mp4'
+          : MediaRecorder.isTypeSupported('audio/webm')
+            ? 'audio/webm'
+            : 'audio/ogg';
+
+        mediaRecorder = new MediaRecorder(stream, { mimeType });
+
+        mediaRecorder.ondataavailable = event => {
+          if (event.data.size > 0) audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(audioChunks, { type: mimeType });
+          const audioURL = URL.createObjectURL(blob);
+          audioPlayer.src = audioURL;
+
+          downloadLink.href = audioURL;
+          downloadLink.download = `nota-de-voz.${mimeType.split('/')[1]}`;
+          downloadLink.style.display = 'inline-block';
+        };
+
+        mediaRecorder.start();
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        mensaje.innerText = "🎙️ Grabando...";
+      } catch (err) {
+        mensaje.innerText = "Error: " + err.message;
+      }
+    };
+
+    stopBtn.onclick = () => {
+      if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        mensaje.innerText = "Grabación finalizada.";
+      }
+    };
+  </script>
+</body>
+</html>
