@@ -77,6 +77,26 @@
         padding: 12px;
       }
     }
+    body {
+    background-image: url('img/barcos.png'); /* Cambia esta ruta */
+    background-size: cover; /* Ajusta la imagen para cubrir toda la pantalla */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* Hace que el fondo no se mueva al hacer scroll */
+    font-family: sans-serif;
+    min-height: 100vh;
+  }
+
+  /* Para oscurecer ligeramente el fondo y hacer más legibles los elementos */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.3); /* Sombra oscura opcional */
+    z-index: -1;
+  }
   </style>
 </head>
 <body>
