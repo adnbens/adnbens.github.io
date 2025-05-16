@@ -23,6 +23,15 @@
       background-color: #408285; /* Fondo de los encabezados con el color corporativo */
       color: white; /* Texto en blanco para los encabezados */
     }
+    /* Estilo para Carlos Arrillaga */
+
+    .mañana {
+      background-color: #fff9c4; /* Amarillo claro */
+    }
+    .descanso {
+      background-color: #c8e6c9; /* Verde claro */
+    }
+
     .M {
       background-color: #fff9c4; /* Amarillo claro para el turno mañana */
     }
@@ -36,13 +45,13 @@
       background-color: #408285; /* Color corporativo para los nombres de los equipos */
       color: white; /* Texto en blanco para los nombres de los equipos */
     }
-    /* Fondo gris oscuro para las columnas de "trabajador" y "puesto" de los equipos Carlos y Hugo */
-    .equipo-carlos, .equipo-hugo {
+    /* Fondo gris oscuro para las columnas de "trabajador" y "puesto" de los equipos Alma y Hugo */
+    .equipo-alma, .equipo-hugo {
       background-color: #555555; /* Gris oscuro bonito */
       color: white; /* Texto en blanco */
     }
     /* Fondo cálido para las columnas de "trabajador" y "puesto" del equipo Adnane */
-    .equipo-adnane {
+    .equipo-adnane, .equipo-carlos {
       background-color: #555555; /* Naranja suave */
       color: white; /* Texto en blanco */
     }
@@ -62,7 +71,7 @@
       color: white;
     }
     /* Para las líneas que separan los equipos */
-tr:nth-child(10n+1) {
+tr:nth-child(9n+2) {
   border-top: 3px solid #333333; /* Línea más oscura entre los equipos */
 }
 .logo-container {
@@ -80,7 +89,16 @@ tr:nth-child(10n+1) {
   display: inline-block;
   transform: skew(-10deg); /* simula cursiva */
 }
-
+/* Para oscurecer ligeramente el fondo y hacer más legibles los elementos */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.3); /* Sombra oscura opcional */
+    z-index: -1;
+  }
   </style>
 </head>
 <body>
@@ -101,6 +119,7 @@ tr:nth-child(10n+1) {
 
   <button onclick="generarCuadrante()">Cargar Cuadrante</button>
   <button onclick="window.location.href='index.html'">⬅️ Volver</button>
+
   <table id="cuadrante">
     <thead>
       <tr>
@@ -124,9 +143,9 @@ tr:nth-child(10n+1) {
 
     // Lista manual de trabajadores por equipo
     const equipos = [
-      { nombre: "Equipo Carlos", trabajadores: ["Carlos Arrillaga", "Alma Romero", "José J.C.", "Gema A.", "Pablo D.", "Cayetana G.", "Mª Pilar M.", "Vicente R.", "Cristina R.", "Pilar U."] },
-      { nombre: "Equipo Adnane", trabajadores: ["Adnane B. Fellaini", "Eva Mª Beneroso", "Mª I.S.", "Fco. J. A.", "Insaf M.A.", "Narjis G.", "Daniel R.", "Ismain R.", "Ana R.", "Mª Pilar U."] },
-      { nombre: "Equipo Hugo", trabajadores: ["Hugo Guerrero", "Andrea Caro", "Lucrecia G.", "Javier C.", "Paloma M.", "Nadir L.", "Esher S.", "Jorge S.", "Rodrigo S.", "Mª Ángeles V."] }
+      { nombre: "Equipo Alma", trabajadores: ["Alma Romero", "Insaf m. Alami", "Cristina Rodriguez", "Cayetana Gomez", "Javier Castro", "Pablo Damiano", "Mª Pilar Martinez", "Pilar Ulloa"," "] },
+      { nombre: "Equipo Hugo", trabajadores: ["Hugo Guerrero", "Eva Mª Beneroso", "Fco. Javier Antón", "Lucrecia García", "Daniel Rojas", "Ismain Rubio","Mª Inés Serrano", "Mª Pilar Ulpiano", "Ana Ruiz"] },
+      { nombre: "Equipo Adnane", trabajadores: ["Adnane Bensliman", "Vicente Rivero", "Paloma Majuelos", "Narjis Guerrero", "Rodrigo Serrano", "Jorge Sánchez", "Esher Sánchez", "José J. Chinchilla", "Mª Ángeles Vela"] }
     ];
 
     function obtenerDiaSemana(fecha) {
@@ -172,6 +191,43 @@ function formatDate(date) {
         th.textContent = formatDate(fecha);
         theadRow.appendChild(th);
       });
+// Añadir fila especial para Carlos Arrillaga
+const filaCarlos = document.createElement("tr");
+
+// Celda vacía en lugar de equipo (si no pertenece a uno)
+const tdVacio = document.createElement("td");
+tdVacio.textContent = ""; // o "Carlos Arrillaga" si deseas que aparezca como equipo
+filaCarlos.appendChild(tdVacio);
+
+// Nombre
+const tdNombreCarlos = document.createElement("td");
+tdNombreCarlos.textContent = "Carlos Arrillaga";
+tdNombreCarlos.classList.add("equipo-carlos"); // puedes definir un color si quieres
+filaCarlos.appendChild(tdNombreCarlos);
+
+// Puesto
+const tdPuestoCarlos = document.createElement("td");
+tdPuestoCarlos.textContent = "Coordinador Principal";
+tdPuestoCarlos.classList.add("equipo-carlos");
+filaCarlos.appendChild(tdPuestoCarlos);
+
+// Turnos para Carlos
+fechas.forEach(fecha => {
+  const td = document.createElement("td");
+  const diaSemana = fecha.getDay(); // 0 = domingo, 6 = sábado
+
+  if (diaSemana === 0 || diaSemana === 6) {
+    td.textContent = "D";
+    td.className = "descanso"; // puedes definir este estilo en CSS
+  } else {
+    td.textContent = "M";
+    td.className = "mañana";
+  }
+
+  filaCarlos.appendChild(td);
+});
+
+tbody.appendChild(filaCarlos);
 
       equipos.forEach((equipo, indexEquipo) => {
         equipo.trabajadores.forEach((trabajador, indexTrabajador) => {
@@ -180,7 +236,7 @@ function formatDate(date) {
           if (indexTrabajador === 0) {
             const tdEquipo = document.createElement("td");
             tdEquipo.textContent = equipo.nombre;
-            tdEquipo.rowSpan = 10;
+            tdEquipo.rowSpan = 9;
             tdEquipo.classList.add("equipo");  // Aplicar clase de color de fondo
             fila.appendChild(tdEquipo);
           }
@@ -188,8 +244,8 @@ function formatDate(date) {
           const tdNombre = document.createElement("td");
           tdNombre.textContent = trabajador;
           // Aplicar color de fondo según el equipo
-          if (equipo.nombre === "Equipo Carlos" || equipo.nombre === "Equipo Hugo") {
-            tdNombre.classList.add("equipo-carlos", "equipo-hugo");  // Gris oscuro bonito
+          if (equipo.nombre === "Equipo Alma" || equipo.nombre === "Equipo Hugo") {
+            tdNombre.classList.add("equipo-alma", "equipo-hugo");  // Gris oscuro bonito
           } else if (equipo.nombre === "Equipo Adnane") {
             tdNombre.classList.add("equipo-adnane");  // Naranja suave
           }
@@ -203,15 +259,13 @@ function formatDate(date) {
             puesto = "Taquilla";
           } else if (indexTrabajador >= 5 && indexTrabajador <= 8) {
             puesto = "Autos";
-          } else {
-            puesto = "Pasaje";
-          }
+          } 
 
           const tdPuesto = document.createElement("td");
           tdPuesto.textContent = puesto;
           // Aplicar el fondo según el equipo
-          if (equipo.nombre === "Equipo Carlos" || equipo.nombre === "Equipo Hugo") {
-            tdPuesto.classList.add("equipo-carlos", "equipo-hugo");
+          if (equipo.nombre === "Equipo Alma" || equipo.nombre === "Equipo Hugo") {
+            tdPuesto.classList.add("equipo-alma", "equipo-hugo");
           } else if (equipo.nombre === "Equipo Adnane") {
             tdPuesto.classList.add("equipo-adnane");
           }
