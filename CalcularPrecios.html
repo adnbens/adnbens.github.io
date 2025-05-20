@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Precio de Viaje</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #408285, #306b6f);
+    }
+    .input-style {
+      @apply border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#408285] w-full;
+    }
+  .btn-corporativo {
+    background-color: #408285;
+    color: white;
+  }
+  .btn-corporativo:hover {
+    background-color: #326b6e;
+  }
+.logo-balearia {
+      background-color: #408285; /* color corporativo */
+      color: white;
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: 36px;
+      padding: 10px 30px;
+      display: inline-block;
+      border-radius: 4px; /* opcional, para suavizar */
+      letter-spacing: 2px;
+      transform: skew(-10deg);/* inclinación forzada */
+    }
+    .logo-container {
+      background-color: #408285; /* color corporativo */
+      display: inline-block;
+      padding: 10px 30px;
+      border-radius: 4px;
+    }
+
+    .logo-text {
+      color: white;
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: 16px;
+      letter-spacing: 2px;
+      display: inline-block;
+      transform: skew(-10deg); /* solo el texto */
+    }
+    .header {
+  display: flex;
+  align-items: center; /* Alinea verticalmente */
+  justify-content: center; /* Centra horizontalmente todo el grupo */
+  gap: 20px; /* Espacio entre logo y título */
+  flex-wrap: wrap; /* Para que no se rompa en pantallas pequeñas */
+  margin-bottom: 20px;
+}
+.app-title {
+  margin: 0;
+}
+h1 {
+      text-align: center;
+      color: #408285;
+      font-size: 2rem;
+    }
+.separator {
+      border-top: 2px solid #408285;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white shadow-xl rounded-2xl p-8 max-w-3xl w-full">
+    <!--<h1 class="text-2xl font-bold text-center text-[#408285] mb-6">Calculadora de Precio de Viaje</h1> -->
+
+
+<div class="container">
+    <div class="header">
+    <div class="logo-container">
+    <span class="logo-text">BALEARIA</span>
+    <button onclick="window.location.href='index.html'">⬅️ Volver</button>
+  </div>
+  
+</div>   
+<h1 class="app-title">  Calculadora de viajes  </h1>
+<div class="separator"></div>
+
+    <form id="travelForm" class="space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <input type="number" min="0" placeholder="Nº Adultos" id="adultos" class="input-style">
+        <input type="number" min="0" placeholder="Nº Menores" id="menores" class="input-style">
+        <input type="number" min="0" placeholder="Nº Bebés" id="bebes" class="input-style">
+
+        <select id="vehiculo" class="input-style">
+          <option value="">Sin vehículo</option>
+          <option value="coche">Coche</option>
+          <option value="furgon">Furgón</option>
+          <option value="caravana">Caravana</option>
+          <option value="moto">Moto</option>
+        </select>
+
+        <select id="remolque" class="input-style">
+          <option value="no">Sin remolque</option>
+          <option value="si">Con remolque</option>
+        </select>
+
+        <select id="tipoViaje" class="input-style" onchange="toggleClase()">
+          <option value="ida_tarifa_tangerville">Ida</option>
+          <option value="idayvuelta_tarifa_tangerville">Ida y vuelta</option>
+          <option value="multitrayecto">Multitrayecto</option>
+        </select>
+
+        <select id="clase" class="input-style">
+          <option value="sirena">Sirena</option>
+          <option value="neptuno">Neptuno</option>
+        </select>
+      </div>
+<div class="separator"></div>
+      <div class="text-center mt-4 space-x-4">
+        <button type="button" onclick="calcularPrecio()" class="btn-corporativo font-bold px-6 py-2 rounded-xl shadow">Calcular</button>
+        <button type="button" onclick="limpiarFormulario()" class="bg-gray-500 text-white font-bold px-6 py-2 rounded-xl shadow hover:bg-gray-600">Limpiar</button>
+        <button type="button" onclick="imprimirPrecio()" class="bg-yellow-500 text-white font-bold px-6 py-2 rounded-xl shadow hover:bg-yellow-600">Imprimir</button>
+      </div>
+    </form>
+
+    <div class="mt-6 text-xl font-semibold text-center text-green-700" id="resultado"></div>
+  </div>
+  <script>
+    const precios = {
+      ida_tarifa_tangerville: {
+        adulto: { sirena: 40, neptuno: 50 },
+        menor: { sirena: 24, neptuno: 34 },
+        bebe: { sirena: 13, neptuno: 23 },
+        coche: 171, furgon: 191, caravana: 245, moto: 49, remolque: 70
+      },
+      idayvuelta_tarifa_tangerville: {
+        adulto: { sirena: 68, neptuno: 88 },
+        menor: { sirena: 41, neptuno: 61 },
+        bebe: { sirena: 25, neptuno: 45 },
+        coche: 307, furgon: 296, caravana: 340, moto: 85, remolque: 120
+      },
+      multitrayecto: {
+        adulto: 57, menor: 32.25, bebe: 20,
+        coche: 254, furgon: 288, caravana: 315, moto: 81.5, remolque: 115
+      }
+    };
+
+    function calcularPrecio() {
+  const adultos = parseInt(document.getElementById('adultos').value) || 0;
+  const menores = parseInt(document.getElementById('menores').value) || 0;
+  const bebes = parseInt(document.getElementById('bebes').value) || 0;
+  const vehiculo = document.getElementById('vehiculo').value;
+  const remolque = document.getElementById('remolque').value;
+  const tipoViaje = document.getElementById('tipoViaje').value;
+  const clase = document.getElementById('clase').value;
+
+  let total = 0;
+
+  if (tipoViaje === 'multitrayecto') {
+    total += adultos * precios[tipoViaje].adulto;
+    total += menores * precios[tipoViaje].menor;
+    total += bebes * precios[tipoViaje].bebe;
+    if (vehiculo) total += precios[tipoViaje][vehiculo];
+    if (remolque === 'si') total += precios[tipoViaje].remolque;
+  } else {
+    total += adultos * precios[tipoViaje].adulto[clase];
+    total += menores * precios[tipoViaje].menor[clase];
+    total += bebes * precios[tipoViaje].bebe[clase];
+    if (vehiculo) total += precios[tipoViaje][vehiculo];
+    if (remolque === 'si') total += precios[tipoViaje].remolque;
+  }
+
+  // Construcción del mensaje descriptivo
+  let detalles = [];
+
+  if (adultos > 0) detalles.push(`${adultos} adulto${adultos > 1 ? 's' : ''}`);
+  if (menores > 0) detalles.push(`${menores} menor${menores > 1 ? 'es' : ''}`);
+  if (bebes > 0) detalles.push(`${bebes} bebé${bebes > 1 ? 's' : ''}`);
+  if (vehiculo) detalles.push(`1 ${vehiculo}`);
+  if (remolque === 'si') detalles.push('1 remolque');
+
+  if (tipoViaje === 'multitrayecto') {
+    detalles.push('multitrayecto');
+  } else {
+    detalles.push(`en clase ${clase}`);
+    if (tipoViaje.includes('ida') && tipoViaje.includes('vuelta')) {
+      detalles.push('ida y vuelta');
+    } else {
+      detalles.push('solo ida');
+    }
+  }
+
+  const descripcion = detalles.join(', ');
+  document.getElementById('resultado').innerText =
+    `Precio total: ${total.toFixed(2)} €\n${descripcion}`;
+}
+
+
+    function limpiarFormulario() {
+      document.getElementById('travelForm').reset();
+      document.getElementById('resultado').innerText = '';
+      document.getElementById('clase').disabled = false;
+    }
+
+    function toggleClase() {
+      const tipoViaje = document.getElementById('tipoViaje').value;
+      const clase = document.getElementById('clase');
+      clase.disabled = tipoViaje === 'multitrayecto';
+    }
+
+    function imprimirPrecio() {
+      const resultado = document.getElementById('resultado').innerText;
+      if (resultado) {
+        const ventana = window.open('', '_blank');
+        ventana.document.write(`<html><head><title>Precio Total</title></head><body><h2>${resultado}</h2></body></html>`);
+        ventana.document.close();
+        ventana.print();
+      } else {
+        alert('Debe calcular un precio antes de imprimir.');
+      }
+    }
+  </script>
+  <footer style="text-align: center; font-size: 0.85rem; color: #666; margin-top: 40px; padding-bottom: 10px;">
+  © 2025 Adnane Bensliman. Todos los derechos reservados.<br>
+</footer>
+</body>
+</html>
+
