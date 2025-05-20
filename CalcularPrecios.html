@@ -11,8 +11,16 @@
       background: linear-gradient(to right, #408285, #306b6f);
     }
     .input-style {
-      @apply border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#408285] w-full;
-    }
+  width: 100%;
+  border: 1px solid #d1d5db; /* border-gray-300 */
+  border-radius: 0.5rem; /* rounded-lg */
+  padding: 0.5rem; /* p-2 */
+  outline: none;
+}
+.input-style:focus {
+  box-shadow: 0 0 0 2px #408285; /* ring-[#408285] */
+}
+
   .btn-corporativo {
     background-color: #408285;
     color: white;
@@ -66,6 +74,8 @@ h1 {
       border-top: 2px solid #408285;
       margin: 20px 0;
     }
+
+
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -91,42 +101,77 @@ h1 {
 <div class="separator"></div>
 
     <form id="travelForm" class="space-y-4">
-      <div class="grid grid-cols-2 gap-4">
-        <input type="number" min="0" placeholder="Nº Adultos" id="adultos" class="input-style">
-        <input type="number" min="0" placeholder="Nº Menores" id="menores" class="input-style">
-        <input type="number" min="0" placeholder="Nº Bebés" id="bebes" class="input-style">
+  <div class="grid grid-cols-2 gap-4">
 
-        <select id="vehiculo" class="input-style">
-          <option value="">Sin vehículo</option>
-          <option value="coche">Coche</option>
-          <option value="furgon">Furgón</option>
-          <option value="caravana">Caravana</option>
-          <option value="moto">Moto</option>
-        </select>
+    <!-- Adultos -->
+    <div>
+      <label for="adultos" class="block text-sm font-medium text-gray-700">Adultos</label>
+      <input type="number" min="0" placeholder="Nº Adultos" id="adultos" class="input-style">
+    </div>
 
-        <select id="remolque" class="input-style">
-          <option value="no">Sin remolque</option>
-          <option value="si">Con remolque</option>
-        </select>
+    <!-- Menores -->
+    <div>
+      <label for="menores" class="block text-sm font-medium text-gray-700">Menores</label>
+      <input type="number" min="0" placeholder="Nº Menores" id="menores" class="input-style">
+    </div>
 
-        <select id="tipoViaje" class="input-style" onchange="toggleClase()">
-          <option value="ida_tarifa_tangerville">Ida</option>
-          <option value="idayvuelta_tarifa_tangerville">Ida y vuelta</option>
-          <option value="multitrayecto">Multitrayecto</option>
-        </select>
+    <!-- Bebés -->
+    <div>
+      <label for="bebes" class="block text-sm font-medium text-gray-700">Bebés</label>
+      <input type="number" min="0" placeholder="Nº Bebés" id="bebes" class="input-style">
+    </div>
 
-        <select id="clase" class="input-style">
-          <option value="sirena">Sirena</option>
-          <option value="neptuno">Neptuno</option>
-        </select>
-      </div>
-<div class="separator"></div>
-      <div class="text-center mt-4 space-x-4">
-        <button type="button" onclick="calcularPrecio()" class="btn-corporativo font-bold px-6 py-2 rounded-xl shadow">Calcular</button>
-        <button type="button" onclick="limpiarFormulario()" class="bg-gray-500 text-white font-bold px-6 py-2 rounded-xl shadow hover:bg-gray-600">Limpiar</button>
-        <button type="button" onclick="imprimirPrecio()" class="bg-yellow-500 text-white font-bold px-6 py-2 rounded-xl shadow hover:bg-yellow-600">Imprimir</button>
-      </div>
-    </form>
+    <!-- Tipo Vehículo -->
+    <div>
+      <label for="vehiculo" class="block text-sm font-medium text-gray-700">Tipo Vehículo</label>
+      <select id="vehiculo" class="input-style">
+        <option value="">Sin vehículo</option>
+        <option value="coche">Coche</option>
+        <option value="furgon">Furgón</option>
+        <option value="caravana">Caravana</option>
+        <option value="moto">Moto</option>
+      </select>
+    </div>
+
+    <!-- Extras -->
+    <div>
+      <label for="remolque" class="block text-sm font-medium text-gray-700">Extras</label>
+      <select id="remolque" class="input-style">
+        <option value="no">Sin remolque</option>
+        <option value="si">Con remolque</option>
+      </select>
+    </div>
+
+    <!-- Trayecto -->
+    <div>
+      <label for="tipoViaje" class="block text-sm font-medium text-gray-700">Trayecto</label>
+      <select id="tipoViaje" class="input-style" onchange="toggleClase()">
+        <option value="ida_tarifa_tangerville">Ida</option>
+        <option value="idayvuelta_tarifa_tangerville">Ida y vuelta</option>
+        <option value="multitrayecto">Multitrayecto</option>
+      </select>
+    </div>
+
+    <!-- Acomodación -->
+    <div>
+      <label for="clase" class="block text-sm font-medium text-gray-700">Acomodación</label>
+      <select id="clase" class="input-style">
+        <option value="sirena">Sirena</option>
+        <option value="neptuno">Neptuno</option>
+      </select>
+    </div>
+
+  </div>
+
+  <div class="separator"></div>
+
+  <div class="text-center mt-4 space-x-4">
+    <button type="button" onclick="calcularPrecio()" class="btn-corporativo font-bold px-6 py-2 rounded-xl shadow">Calcular</button>
+    <button type="button" onclick="limpiarFormulario()" class="bg-gray-500 text-white font-bold px-6 py-2 rounded-xl shadow hover:bg-gray-600">Limpiar</button>
+    <button type="button" onclick="imprimirPrecio()" class="bg-yellow-500 text-white font-bold px-6 py-2 rounded-xl shadow hover:bg-yellow-600">Imprimir</button>
+  </div>
+</form>
+
 
     <div class="mt-6 text-xl font-semibold text-center text-green-700" id="resultado"></div>
   </div>
