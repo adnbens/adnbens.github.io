@@ -1,5 +1,4 @@
 <!-- Adnane Bensliman  -->
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -95,13 +94,58 @@ button:hover {
   button:active {
     transform: scale(0.98);
   }
+  .logo-balearia {
+      background-color: #408285; /* color corporativo */
+      color: white;
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: 36px;
+      padding: 10px 30px;
+      display: inline-block;
+      border-radius: 4px; /* opcional, para suavizar */
+      letter-spacing: 2px;
+      transform: skew(-10deg);/* inclinación forzada */
+    }
+    .logo-container {
+      background-color: #408285; /* color corporativo */
+      display: inline-block;
+      padding: 10px 30px;
+      border-radius: 4px;
+    }
+
+    .logo-text {
+      color: white;
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: 35px;
+      letter-spacing: 2px;
+      display: inline-block;
+      transform: skew(-10deg); /* solo el texto */
+    }
+    .header {
+  display: flex;
+  align-items: center; /* Alinea verticalmente */
+  justify-content: center; /* Centra horizontalmente todo el grupo */
+  gap: 20px; /* Espacio entre logo y título */
+  flex-wrap: wrap; /* Para que no se rompa en pantallas pequeñas */
+  margin-bottom: 20px;
+}
+.app-title {
+  margin: 0;
+}
   </style>
 </head>
 <body>
   <header>
-    <h1>Lector de Pasaporte (MRZ)</h1>
+    
+    <div class="container">
+    <div class="header">
+    <div class="logo-container">
+    <span class="logo-text">BALEARIA</span>
+    <h1>Lector de Pasaportes</h1>
+  </div>
   </header>
+
   <main>
+
     <p>Escanee el pasaporte en el campo a continuación:</p>
     <textarea id="inputMRZ" placeholder="Escanee aquí..."></textarea>
 
@@ -139,7 +183,23 @@ button:hover {
   ">
     Imprimir
   </button>
+
+  <button onclick="window.location.href='index.html'" style="
+    background-color: #408285;
+    color: white;
+    font-size: 16px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-left: 20px;
+  ">
+    ⬅️ Volver
+  </button>
 </div>
+
 <script>
   const input = document.getElementById('inputMRZ');
 
@@ -494,6 +554,11 @@ function imprimirPlantilla() {
   ventana.close();
 }
 
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('inputMRZ').focus();
+  });
+
+
   </script>
 
 <!--<div id="plantillaImpresion" style="display: none; width: 10cm; height: 20cm; position: relative; background: white; border: 1px solid #ccc;">-->
@@ -517,9 +582,7 @@ function imprimirPlantilla() {
   <!--<div id="imp_sexo" style="position: absolute; left: 10mm; top: 80mm;"></div>-->
 </div>
 
-<footer style="text-align: center; font-size: 0.85rem; color: #666; margin-top: 40px; padding-bottom: 10px;">
-  © 2025 Adnane Bensliman. Todos los derechos reservados.<br>
-</footer>
+
 
 
 </body>
