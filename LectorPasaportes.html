@@ -1,0 +1,524 @@
+<!-- P<ESPBENSLIMAN<FELLAINI<<ADNANE<<<<<<<<<<<<<PAG2068498ESP7407103M2801315A7592080600<<<72  -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Lector de Pasaporte (MRZ)</title>
+  <style>
+    :root {
+      --primario: #408285;
+      --claro: #e6f0ef;
+      --oscuro: #2e5f5a;
+      --texto: #333;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9;
+      color: var(--texto);
+    }
+
+    header {
+      background-color: var(--primario);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    main {
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: var(--oscuro);
+      margin-top: 0;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      font-size: 16px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+
+    .resultado {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .campo {
+      background-color: var(--claro);
+      padding: 10px 15px;
+      border-left: 5px solid var(--primario);
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    strong {
+      color: var(--oscuro);
+    }
+
+    @media (max-width: 600px) {
+      main {
+        margin: 20px;
+        padding: 20px;
+      }
+    }
+@media print {
+  body {
+    background-image: url('FichedePolice.PNG');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+}
+
+button:hover {
+    background-color: #002244;
+    transform: scale(1.03);
+  }
+
+  button:active {
+    transform: scale(0.98);
+  }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Lector de Pasaporte (MRZ)</h1>
+  </header>
+  <main>
+    <p>Escanee el pasaporte en el campo a continuación:</p>
+    <textarea id="inputMRZ" placeholder="Escanee aquí..."></textarea>
+
+    <div id="resultado" class="resultado">
+      <!-- <div class="campo" id="doc"></div> -->
+      <div class="campo" id="apellidos"></div>
+      <div class="campo" id="nombres"></div>
+      
+      <div class="campo" id="nacimiento"></div>
+      <div class="campo" id="emisor"></div>
+      <div class="campo" id="nacionalidad"></div>
+      <div class="campo" id="emisor"></div>
+
+      <div class="campo" id="pasaporte"></div>
+      
+      <div class="campo" id="expiracion"></div>
+      
+      
+      
+      <!--   <div class="campo" id="sexo"></div> -->
+    </div>
+  </main>
+
+<div style="display: flex; justify-content: center; margin-top: 20px;">
+  <button onclick="imprimirPlantilla()" style="
+    background-color: #408285;
+    color: white;
+    font-size: 16px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  ">
+    Imprimir
+  </button>
+</div>
+<script>
+  const input = document.getElementById('inputMRZ');
+
+  input.addEventListener('input', () => {
+    let value = input.value.trim();
+    let line1 = '', line2 = '';
+
+    // Si tiene salto de línea
+    if (value.includes('\n')) {
+      const lines = value.split('\n');
+      if (lines.length >= 2 && lines[0].length === 44 && lines[1].length === 44) {
+        line1 = lines[0];
+        line2 = lines[1];
+      }
+    }
+    // Si es una sola línea de 88 caracteres
+    else if (value.length === 88) {
+      line1 = value.slice(0, 44);
+      line2 = value.slice(44, 88);
+    }
+
+    // Si ya tenemos ambas líneas válidas
+    if (line1.length === 44 && line2.length === 44) {
+      const documento = line1.slice(0, 2);
+      const paisEmisorCodigo = line1.slice(2, 5);
+      const paisEmisor = getCountryNameFr(paisEmisorCodigo);
+
+      const nombresYApellidosRaw = line1.slice(5);
+      const [apellidosRaw, nombresRaw] = nombresYApellidosRaw.split('<<');
+      const apellido = apellidosRaw.replace(/</g, ' ').trim();
+      const nombres = (nombresRaw || '').replace(/</g, ' ').trim();
+
+      const pasaporteNum = line2.slice(0, 9).replace(/</g, '');
+      const nacionalidadCodigo = line2.slice(10, 13);
+      const nacionalidad = getCountryNameFr(nacionalidadCodigo);
+
+      const nacimiento = line2.slice(13, 19);
+      const sexo = line2.slice(20, 21);
+      const expiracion = line2.slice(21, 27);
+
+     
+        // Llenamos cada div individualmente
+        //document.getElementById('doc').innerHTML = `<strong>Tipo de documento: PASAPORTE</strong>`;
+        document.getElementById('emisor').innerHTML = `${paisEmisor}`;
+        document.getElementById('apellidos').innerHTML = `${apellido}`;
+        document.getElementById('nombres').innerHTML = `${nombres}`;
+        document.getElementById('pasaporte').innerHTML = `${pasaporteNum}`;
+        document.getElementById('nacionalidad').innerHTML = `${nacionalidad}`;
+        document.getElementById('nacimiento').innerHTML = `${formatDate(nacimiento)}`;
+        //document.getElementById('sexo').innerHTML = `<strong>Sexo:</strong> ${sexo}`;
+        document.getElementById('expiracion').innerHTML = `${formatDate(expiracion)}`;
+      }
+    });
+
+    function formatDate(str) {
+      const year = str.slice(0, 2);
+      const month = str.slice(2, 4);
+      const day = str.slice(4, 6);
+      return `${day}/${month}/${year}`;
+    }
+
+   function getCountryNameFr(code) {
+      const countries = {
+    "AFG": "Afghanistan",
+    "ALB": "Albanie",
+    "DZA": "Algérie",
+    "AND": "Andorre",
+    "AGO": "Angola",
+    "ATG": "Antigua-et-Barbuda",
+    "ARG": "Argentine",
+    "ARM": "Arménie",
+    "AUS": "Australie",
+    "AUT": "Autriche",
+    "AZE": "Azerbaïdjan",
+    "BHS": "Bahamas",
+    "BHR": "Bahreïn",
+    "BGD": "Bangladesh",
+    "BRB": "Barbade",
+    "BLR": "Biélorussie",
+    "BEL": "Belgique",
+    "BLZ": "Belize",
+    "BEN": "Bénin",
+    "BTN": "Bhoutan",
+    "BOL": "Bolivie",
+    "BIH": "Bosnie-Herzégovine",
+    "BWA": "Botswana",
+    "BRA": "Brésil",
+    "BRN": "Brunei",
+    "BGR": "Bulgarie",
+    "BFA": "Burkina Faso",
+    "BDI": "Burundi",
+    "KHM": "Cambodge",
+    "CMR": "Cameroun",
+    "CAN": "Canada",
+    "CPV": "Cap-Vert",
+    "CAF": "République centrafricaine",
+    "TCD": "Tchad",
+    "CHL": "Chili",
+    "CHN": "Chine",
+    "COL": "Colombie",
+    "COM": "Comores",
+    "COG": "Congo",
+    "COD": "République démocratique du Congo",
+    "CRI": "Costa Rica",
+    "CIV": "Côte d'Ivoire",
+    "HRV": "Croatie",
+    "CUB": "Cuba",
+    "CYP": "Chypre",
+    "CZE": "Tchéquie",
+    "DNK": "Danemark",
+    "DJI": "Djibouti",
+    "DMA": "Dominique",
+    "DOM": "République dominicaine",
+    "ECU": "Équateur",
+    "EGY": "Égypte",
+    "SLV": "Salvador",
+    "GNQ": "Guinée équatoriale",
+    "ERI": "Érythrée",
+    "EST": "Estonie",
+    "SWZ": "Eswatini",
+    "ETH": "Éthiopie",
+    "FJI": "Fidji",
+    "FIN": "Finlande",
+    "FRA": "France",
+    "GAB": "Gabon",
+    "GMB": "Gambie",
+    "GEO": "Géorgie",
+    "DEU": "Allemagne",
+    "D<<": "Allemagne",//añadida para pasaportes alemanes con la letra D sola
+    "GHA": "Ghana",
+    "GRC": "Grèce",
+    "GRD": "Grenade",
+    "GTM": "Guatemala",
+    "GIN": "Guinée",
+    "GNB": "Guinée-Bissau",
+    "GUY": "Guyana",
+    "HTI": "Haïti",
+    "HND": "Honduras",
+    "HUN": "Hongrie",
+    "ISL": "Islande",
+    "IND": "Inde",
+    "IDN": "Indonésie",
+    "IRN": "Iran",
+    "IRQ": "Irak",
+    "IRL": "Irlande",
+    "ISR": "Israël",
+    "ITA": "Italie",
+    "JAM": "Jamaïque",
+    "JPN": "Japon",
+    "JOR": "Jordanie",
+    "KAZ": "Kazakhstan",
+    "KEN": "Kenya",
+    "KIR": "Kiribati",
+    "PRK": "Corée du Nord",
+    "KOR": "Corée du Sud",
+    "KWT": "Koweït",
+    "KGZ": "Kirghizistan",
+    "LAO": "Laos",
+    "LVA": "Lettonie",
+    "LBN": "Liban",
+    "LSO": "Lesotho",
+    "LBR": "Libéria",
+    "LBY": "Libye",
+    "LIE": "Liechtenstein",
+    "LTU": "Lituanie",
+    "LUX": "Luxembourg",
+    "MDG": "Madagascar",
+    "MWI": "Malawi",
+    "MYS": "Malaisie",
+    "MDV": "Maldives",
+    "MLI": "Mali",
+    "MLT": "Malte",
+    "MHL": "Îles Marshall",
+    "MRT": "Mauritanie",
+    "MUS": "Maurice",
+    "MEX": "Mexique",
+    "FSM": "Micronésie",
+    "MDA": "Moldavie",
+    "MCO": "Monaco",
+    "MNG": "Mongolie",
+    "MNE": "Monténégro",
+    "MAR": "Maroc",
+    "MOZ": "Mozambique",
+    "MMR": "Myanmar",
+    "NAM": "Namibie",
+    "NRU": "Nauru",
+    "NPL": "Népal",
+    "NLD": "Pays-Bas",
+    "NZL": "Nouvelle-Zélande",
+    "NIC": "Nicaragua",
+    "NER": "Niger",
+    "NGA": "Nigéria",
+    "MKD": "Macédoine du Nord",
+    "NOR": "Norvège",
+    "OMN": "Oman",
+    "PAK": "Pakistan",
+    "PLW": "Palaos",
+    "PAN": "Panama",
+    "PNG": "Papouasie-Nouvelle-Guinée",
+    "PRY": "Paraguay",
+    "PER": "Pérou",
+    "PHL": "Philippines",
+    "POL": "Pologne",
+    "PRT": "Portugal",
+    "QAT": "Qatar",
+    "ROU": "Roumanie",
+    "RUS": "Russie",
+    "RWA": "Rwanda",
+    "KNA": "Saint-Christophe-et-Niévès",
+    "LCA": "Sainte-Lucie",
+    "VCT": "Saint-Vincent-et-les-Grenadines",
+    "WSM": "Samoa",
+    "SMR": "Saint-Marin",
+    "STP": "Sao Tomé-et-Principe",
+    "SAU": "Arabie saoudite",
+    "SEN": "Sénégal",
+    "SRB": "Serbie",
+    "SYC": "Seychelles",
+    "SLE": "Sierra Leone",
+    "SGP": "Singapour",
+    "SVK": "Slovaquie",
+    "SVN": "Slovénie",
+    "SLB": "Îles Salomon",
+    "SOM": "Somalie",
+    "ZAF": "Afrique du Sud",
+    "SSD": "Soudan du Sud",
+    "ESP": "Espagne",
+    "LKA": "Sri Lanka",
+    "SDN": "Soudan",
+    "SUR": "Suriname",
+    "SWE": "Suède",
+    "CHE": "Suisse",
+    "SYR": "Syrie",
+    "TJK": "Tadjikistan",
+    "TZA": "Tanzanie",
+    "THA": "Thaïlande",
+    "TLS": "Timor oriental",
+    "TGO": "Togo",
+    "TON": "Tonga",
+    "TTO": "Trinité-et-Tobago",
+    "TUN": "Tunisie",
+    "TUR": "Turquie",
+    "TKM": "Turkménistan",
+    "TUV": "Tuvalu",
+    "UGA": "Ouganda",
+    "UKR": "Ukraine",
+    "ARE": "Émirats arabes unis",
+    "GBR": "Royaume-Uni",
+    "USA": "États-Unis",
+    "URY": "Uruguay",
+    "UZB": "Ouzbékistan",
+    "VUT": "Vanuatu",
+    "VEN": "Venezuela",
+    "VNM": "Viêt Nam",
+    "YEM": "Yémen",
+    "ZMB": "Zambie",
+    "ZWE": "Zimbabwe"
+  };
+
+  return countries[code] || code;
+}
+function imprimirPlantilla() {
+  // Rellenar los campos
+  document.getElementById('imp_doc').innerText = document.getElementById('doc').innerText;
+  document.getElementById('imp_emisor').innerText = document.getElementById('emisor').innerText;
+  document.getElementById('imp_apellidos').innerText = document.getElementById('apellidos').innerText;
+  document.getElementById('imp_nombres').innerText = document.getElementById('nombres').innerText;
+  document.getElementById('imp_pasaporte').innerText = document.getElementById('pasaporte').innerText;
+  document.getElementById('imp_nacionalidad').innerText = document.getElementById('nacionalidad').innerText;
+  document.getElementById('imp_nacimiento').innerText = document.getElementById('nacimiento').innerText;
+  document.getElementById('imp_sexo').innerText = document.getElementById('sexo').innerText;
+  document.getElementById('imp_expiracion').innerText = document.getElementById('expiracion').innerText;
+
+  // Crear una nueva ventana de impresión
+  const ventana = window.open('', 'PRINT', 'width=400,height=800');
+  ventana.document.write(`
+    <html>
+      <head>
+        <title>Impresión personalizada</title>
+        <style>
+          body {
+            margin: 0;
+            padding: 0;
+          }
+          #plantilla {
+            width: 10cm;
+            height: 20cm;
+            position: relative;
+            font-size: 14pt;
+          }
+          div[data-campo] {
+            position: absolute;
+          }
+        </style>
+      </head>
+      <body>
+        <div id="plantilla">
+          ${document.getElementById('plantillaImpresion').innerHTML}
+        </div>
+      </body>
+    </html>
+  `);
+  ventana.document.close();
+  ventana.focus();
+  ventana.print();
+  ventana.close();
+}
+function imprimirPlantilla() {
+  // Rellenar los campos
+  //document.getElementById('imp_doc').innerText = document.getElementById('doc').innerText;
+  document.getElementById('imp_emisor').innerText = document.getElementById('emisor').innerText;
+  document.getElementById('imp_apellidos').innerText = document.getElementById('apellidos').innerText;
+  document.getElementById('imp_nombres').innerText = document.getElementById('nombres').innerText;
+  document.getElementById('imp_pasaporte').innerText = document.getElementById('pasaporte').innerText;
+  document.getElementById('imp_nacionalidad').innerText = document.getElementById('nacionalidad').innerText;
+  document.getElementById('imp_nacimiento').innerText = document.getElementById('nacimiento').innerText;
+  //document.getElementById('imp_sexo').innerText = document.getElementById('sexo').innerText;
+  document.getElementById('imp_expiracion').innerText = document.getElementById('expiracion').innerText;
+
+  // Crear una nueva ventana de impresión
+  const ventana = window.open('', 'PRINT', 'width=400,height=800');
+  ventana.document.write(`
+    <html>
+      <head>
+        <title>Impresión personalizada</title>
+        <style>
+          body {
+            margin: 0;
+            padding: 0;
+          }
+          #plantilla {
+            width: 10cm;
+            height: 20cm;
+            position: relative;
+            font-size: 14pt;
+          }
+          div[data-campo] {
+            position: absolute;
+          }
+        </style>
+      </head>
+      <body>
+        <div id="plantilla">
+          ${document.getElementById('plantillaImpresion').innerHTML}
+        </div>
+      </body>
+    </html>
+  `);
+  ventana.document.close();
+  ventana.focus();
+  ventana.print();
+  ventana.close();
+}
+
+  </script>
+
+<!--<div id="plantillaImpresion" style="display: none; width: 10cm; height: 20cm; position: relative; background: white; border: 1px solid #ccc;">-->
+  <div id="plantillaImpresion" style="display: none; width: 150mm; height: 200mm; position: relative; background: white; border: 1px solid #ccc; font-size: 6pt;">
+
+  <!--<div id="imp_doc" style="position: absolute; left: 10mm; top: 10mm;"></div>-->
+  <div id="imp_apellidos" style="position: absolute; left: 30mm; top: 10mm;"></div>
+  <div id="imp_nombres" style="position: absolute; left: 40mm; top: 20mm;"></div>
+
+  <div id="imp_nacimiento" style="position: absolute; left: 50mm; top: 40mm;"></div>
+  <div id="imp_nacionalidad" style="position: absolute; left: 50mm; top: 50mm;"></div>
+  <div id="imp_emisor" style="position: absolute; left: 50mm; top: 60mm;"></div>
+
+  <div id="imp_pasaporte" style="position: absolute; left: 50mm; top: 80mm;"></div>
+  <div id="imp_expiracion" style="position: absolute; left: 50mm; top: 90mm;"></div>
+
+  
+  
+  
+  
+  <!--<div id="imp_sexo" style="position: absolute; left: 10mm; top: 80mm;"></div>-->
+</div>
+
+
+
+
+</body>
+</html>
