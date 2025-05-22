@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Menú Principal</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f2f2f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 30px 20px;
+    }
+
+    .logo-container {
+      background-color: #408285; /* color corporativo */
+      display: inline-block;
+      padding: 10px 30px;
+      border-radius: 4px;
+      margin-bottom: 40px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo-balearia {
+      color: white;
+      font-family: 'Arial Black', Impact, sans-serif;
+      font-size: 25px;
+      letter-spacing: 2px;
+      display: inline-block;
+      transform: skew(-10deg); /* simula cursiva */
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #f0f0f0;
+      text-align: center;
+    }
+
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .menu a {
+      text-decoration: none;
+      background-color: #408285;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+      border: none;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .menu a:hover {
+      background-color: #2f6365;
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 500px) {
+      h1 {
+        font-size: 1.6rem;
+      }
+      .menu a {
+        font-size: 1rem;
+        padding: 12px;
+      }
+    }
+
+  body {
+    background-image: url('img/barcos.png'); 
+    background-size: cover; /* Ajusta la imagen para cubrir toda la pantalla */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* Hace que el fondo no se mueva al hacer scroll */
+    font-family: sans-serif;
+    min-height: 100vh;
+  }
+
+  /* Para oscurecer ligeramente el fondo y hacer más legibles los elementos */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.3); /* Sombra oscura opcional */
+    z-index: -1;
+  }
+
+  </style>
+</head>
+<body>
+  <div class="logo-container">
+    <div class="logo-balearia">BALEARIA</div>
+  </div>
+  <h1>Aplicaciones</h1>
+  <div class="menu">
+    <a href="https://adnbens.github.io/ControlHoras.html">Control de Buques</a>
+    <a href="https://adnbens.github.io/Cruce.html">Cruce de Datos</a>
+    <a href="https://adnbens.github.io/Grabadora.html">Grabadora</a>
+    <a href="https://adnbens.github.io/CalcularPrecios.html">Calculadora de Precios</a>
+    <a href="https://adnbens.github.io/LectorPasaportes.html">Lector de pasapportes</a>
+    <!--<a href="https://adnbens.github.io/CuadranteTarifa.html">Cuadrante de Tarifa</a>-->
+  </div>
+</body>
+</html>
+
