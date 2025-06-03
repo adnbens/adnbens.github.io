@@ -308,8 +308,10 @@ tbody.appendChild(filaCarlos);
         selectAnio.appendChild(option);
       }
 
-      selectMes.value = 4; 
-      selectAnio.value = 2025;
+      const hoy = new Date();
+      selectMes.value = hoy.getMonth();
+      selectAnio.value = hoy.getFullYear();
+
     }
 
     rellenarSelects();
