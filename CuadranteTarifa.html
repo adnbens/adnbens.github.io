@@ -7,7 +7,7 @@
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background-color: #f4f4f4; /* Fondo suave para la página */
+      background-color: #408285; /* Fondo suave para la página */
     }
     table {
       border-collapse: collapse;
@@ -51,7 +51,11 @@
       color: white; /* Texto en blanco */
     }
     /* Fondo cálido para las columnas de "trabajador" y "puesto" del equipo Adnane */
-    .equipo-adnane, .equipo-carlos {
+    .equipo-adnane {
+      background-color: #b85c00; /* Naranja suave */
+      color: white; /* Texto en blanco */
+    }
+    .equipo-carlos {
       background-color: #555555; /* Naranja suave */
       color: white; /* Texto en blanco */
     }
@@ -96,9 +100,21 @@ tr:nth-child(9n+2) {
     top: 0; left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.3); /* Sombra oscura opcional */
+    background-color: rgba(0,0,0,0.2); /* Sombra oscura opcional */
     z-index: -1;
   }
+  #titulo {
+  color: white;
+}
+#mes, #anio {
+  color: white;
+  background-color: #408285; /* O el color que prefieras para el fondo */
+  border: 1px solid white;
+}
+label {
+  color: white;
+}
+
   </style>
 </head>
 <body>
@@ -145,7 +161,7 @@ tr:nth-child(9n+2) {
     const equipos = [
       { nombre: "Equipo Alma", trabajadores: ["Alma Romero", "Insaf m. Alami", "Cristina Rodriguez", "Cayetana Gomez", "Javier Castro", "Pablo Damiano", "Mª Pilar Martinez", "Pilar Ulloa"," "] },
       { nombre: "Equipo Hugo", trabajadores: ["Hugo Guerrero", "Eva Mª Beneroso", "Fco. Javier Antón", "Lucrecia García", "Daniel Rojas", "Ismain Rubio","Mª Inés Serrano", "Mª Pilar Ulpiano", "Ana Ruiz"] },
-      { nombre: "Equipo Adnane", trabajadores: ["Adnane Bensliman", "Vicente Rivero", "Paloma Majuelos", "Narjis Guerrero", "Rodrigo Serrano", "Jorge Sánchez", "Esher Sánchez", "José J. Chinchilla", "Mª Ángeles Vela"] }
+      { nombre: "Equipo Adnane", trabajadores: ["Adnane Bensliman", "Vicente Rivero", "Paloma Majuelos", "Narjis Guerrero", "Rodrigo Serrano", "Jorge Sánchez", "Esther S. Curra", "José J. Chinchilla", "Mª Ángeles Vela"] }
     ];
 
     function obtenerDiaSemana(fecha) {
@@ -254,12 +270,15 @@ tbody.appendChild(filaCarlos);
           // Asignar el puesto según el índice
           let puesto;
           if (indexTrabajador === 0) {
-            puesto = "Coordinador";
-          } else if (indexTrabajador >= 1 && indexTrabajador <= 4) {
-            puesto = "Taquilla";
-          } else if (indexTrabajador >= 5 && indexTrabajador <= 8) {
-            puesto = "Autos";
-          } 
+          puesto = "Coordinador";
+          } else if (indexTrabajador >= 1 && indexTrabajador <= 3) {
+          puesto = "Taquilla";
+          } else if (indexTrabajador >= 4 && indexTrabajador <= 7) {
+          puesto = "Control Autos";
+          } else if (indexTrabajador === 8) {
+          puesto = "Autos/Pasaje";
+          }
+
 
           const tdPuesto = document.createElement("td");
           tdPuesto.textContent = puesto;
@@ -307,10 +326,9 @@ tbody.appendChild(filaCarlos);
         option.textContent = y;
         selectAnio.appendChild(option);
       }
-
-      const hoy = new Date();
-      selectMes.value = hoy.getMonth();
-      selectAnio.value = hoy.getFullYear();
+const hoy = new Date();
+selectMes.value = hoy.getMonth();
+selectAnio.value = hoy.getFullYear();
 
     }
 
