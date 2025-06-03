@@ -7,18 +7,37 @@
     body {
       font-family: Arial, sans-serif;
       margin: 50px;
-      background-color: #f4f4f4;
+      background-color: #2e4d4f;
       text-align: center;
+      color: #ffffff;
+    }
+    h1 {
+      color: #66b3ad;
     }
     input, button {
       padding: 10px;
       font-size: 16px;
       margin-top: 10px;
+      border: 2px solid #408285;
+      border-radius: 5px;
+    }
+    input {
+      background-color: #ffffff;
+      color: #000;
+    }
+    button {
+      background-color: #408285;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #306869;
     }
     #resultado {
       margin-top: 20px;
       font-size: 20px;
       font-weight: bold;
+      color: #66b3ad;
     }
   </style>
 </head>
@@ -33,17 +52,32 @@
   <script>
     function calcularLetraDNI() {
       const letras = "TRWAGMYFPDXBNJZSQVHLCKE";
-      const numero = document.getElementById("dniNumero").value;
+      const input = document.getElementById("dniNumero");
+      const numero = input.value;
 
       if (!numero || numero.length < 7 || numero.length > 8 || isNaN(numero)) {
         document.getElementById("resultado").innerText = "Por favor, introduce un número válido de DNI (7 u 8 cifras).";
+        input.focus();
         return;
       }
 
       const resto = numero % 23;
       const letra = letras.charAt(resto);
       document.getElementById("resultado").innerText = `La letra correspondiente al DNI ${numero} es: ${letra}`;
+      input.focus();
     }
+
+    window.onload = function() {
+      const input = document.getElementById("dniNumero");
+      input.focus();
+
+      input.addEventListener("keydown", function(event) {
+        if (event.key === "Tab" && input.value.trim() !== "") {
+          event.preventDefault();
+          calcularLetraDNI();
+        }
+      });
+    };
   </script>
 </body>
 </html>
