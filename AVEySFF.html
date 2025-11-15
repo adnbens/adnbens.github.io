@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Generador de CSV para AVEMAR y JAUME</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background-color: #f5f7fa;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .container {
+        flex: 1; /* Ocupa todo el espacio disponible */
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding-top: 50px;
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 25px;
+    }
+
+    .card {
+        width: 400px;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    label {
+        display: block;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #555;
+    }
+
+    input[type="datetime-local"] {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 20px;
+        background-color: #408285;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #4338ca;
+    }
+
+    footer {
+        text-align: center;
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 20px;
+        padding: 10px 0;
+        background-color: #f5f7fa;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Generador de CSV para el ISPS</h2>
+
+    <div class="card">
+        <label for="fechaAvemar">Fecha y hora inicial AVEMAR:</label>
+        <input type="datetime-local" id="fechaAvemar">
+        <button onclick="generarCSV('AVEMAR')">Descargar CSV AVEMAR</button>
+    </div>
+
+    <div class="card">
+        <label for="fechaJaume">Fecha y hora inicial JAUME:</label>
+        <input type="datetime-local" id="fechaJaume">
+        <button onclick="generarCSV('JAUME')">Descargar CSV JAUME</button>
+    </div>
+</div>
+
+<footer>
+  © 2025 Adnane Bensliman. Todos los derechos reservados.<br>
+</footer>
+
+<script>
+function generarCSV(tipo) {
+    let input;
+    let bloques;
+
+    if(tipo === 'AVEMAR') {
+        input = document.getElementById('fechaAvemar').value;
+        bloques = [
+            {inicio: [22,0], fin: [9,0], location: 'ESTRF', level: 1},
+            {inicio: [10,0], fin: [11,0], location: 'MATNG', level: 2},
+            {inicio: [12,0], fin: [15,0], location: 'ESTRF', level: 1},
+            {inicio: [16,0], fin: [17,0], location: 'MATNG', level: 2},
+            {inicio: [18,0], fin: [19,0], location: 'ESTRF', level: 1},
+            {inicio: [20,0], fin: [21,0], location: 'MATNG', level: 2}
+        ];
+    } else if(tipo === 'JAUME') {
+        input = document.getElementById('fechaJaume').value;
+        bloques = [
+            {inicio: [22,0], fin: [9,0], location: 'MATNG', level: 2},
+            {inicio: [10,0], fin: [11,0], location: 'ESTRF', level: 1},
+            {inicio: [12,0], fin: [15,0], location: 'MATNG', level: 2},
+            {inicio: [16,0], fin: [17,0], location: 'ESTRF', level: 1},
+            {inicio: [18,0], fin: [19,0], location: 'MATNG', level: 2},
+            {inicio: [20,0], fin: [21,0], location: 'ESTRF', level: 1}
+        ];
+    }
+
+    if (!input) { alert('Selecciona una fecha inicial'); return; }
+
+    let fechaActual = new Date(input);
+
+    const cabecera = [
+        "DateTimeArrival",
+        "DateTimeDeparture",
+        "Facility_Location",
+        "Facility_CodeGisis",
+        "Facility_Description",
+        "ProtectionLevel",
+        "SpecialMeasuresDescription",
+        "StartActivityDate",
+        "EndActivityDate",
+        "VesselActivity"
+    ];
+
+    const filas = [];
+
+    let bloqueIndex = bloques.findIndex(b => {
+        const inicio = new Date(fechaActual);
+        inicio.setHours(b.inicio[0], b.inicio[1], 0, 0);
+        const fin = new Date(fechaActual);
+        fin.setHours(b.fin[0], b.fin[1], 0, 0);
+        if (fin <= inicio) fin.setDate(fin.getDate() + 1);
+        return fechaActual >= inicio && fechaActual < fin;
+    });
+    if (bloqueIndex === -1) bloqueIndex = 0;
+
+    for (let i = 0; i < 10; i++) {
+        const bloque = bloques[bloqueIndex];
+
+        let llegada = new Date(fechaActual);
+        llegada.setHours(bloque.inicio[0], bloque.inicio[1], 0, 0);
+
+        let salida = new Date(fechaActual);
+        // Comprobación especial: AVEMAR, bloque ESTRF 12-15, martes
+        if(tipo === 'AVEMAR' && bloque.location === 'ESTRF' && bloque.inicio[0] === 12 && llegada.getDay() === 2) {
+            salida.setHours(13,0,0,0); // salida a las 13:00
+        } else {
+        salida.setHours(bloque.fin[0], bloque.fin[1], 0, 0);
+        if (salida <= llegada) salida.setDate(salida.getDate() + 1);
+        }
+        const formato = (d) => {
+            const pad = n => n.toString().padStart(2,'0');
+            return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
+        };
+
+        filas.push(`${formato(llegada)};${formato(salida)};${bloque.location};;0;${bloque.level};;;;`);
+
+        fechaActual = new Date(salida);
+        bloqueIndex = (bloqueIndex + 1) % bloques.length;
+    }
+
+    const csvContent = cabecera.join(";") + "\n" + filas.join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = tipo + ".csv";
+    a.click();
+
+    URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
