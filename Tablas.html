@@ -44,7 +44,7 @@
   <button onclick="deshacerCancelado()">Deshacer CANCELADO</button>
 </div>
 
-<button onclick="generarYCopiar()">Generar tabla elegante y copiar al portapapeles</button>
+<button onclick="generarYCopiar()">Generar tabla y copiar al portapapeles</button>
 
 <div id="contenedorTabla"></div>
 
@@ -174,7 +174,7 @@ function generarYCopiar() {
   document.execCommand('copy');
   sel.removeAllRanges();
 
-  alert('Tabla elegante copiada al portapapeles con formato');
+  alert('Tabla copiada al portapapeles');
 }
 
 construirFormulario();
