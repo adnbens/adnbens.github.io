@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Generador de tabla editable</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 900px; }
+    button { padding: 8px 14px; margin: 5px 5px 10px 0; cursor: pointer; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; font-family: Arial, sans-serif; }
+    th, td { border: 1px solid #333; padding: 6px 10px; text-align: center; }
+    th { background: #408285; color: white; } /* color corporativo */
+    input { width: 100%; box-sizing: border-box; padding: 4px; text-align: center; }
+  </style>
+</head>
+<body>
+
+<h2>Configuración de la tabla (editable)</h2>
+<p>Puedes modificar horarios y marcar filas como CANCELADAS antes de generar la tabla.</p>
+
+<button onclick="location.reload()">Recargar página</button>
+<button onclick="alternarParImpar()">Pares / Impares (Tánger Ville - Tarifa)</button>
+
+<table id="tablaEditable">
+  <thead>
+    <tr>
+      <th>Tarifa - Tánger Ville</th>
+      <th>Buque</th>
+      <th>Tánger Ville - Tarifa</th>
+    </tr>
+  </thead>
+  <tbody id="formulario"></tbody>
+</table>
+
+<div style="margin-top:10px;">
+  <label>Fila a eliminar (1 = primera, sin cabecera): </label>
+  <input type="number" id="filaEliminar" min="1" style="width:80px;">
+  <button onclick="eliminarFila()">Eliminar fila</button>
+</div>
+
+<div style="margin-top:10px;">
+  <label>Fila a marcar como CANCELADA: </label>
+  <input type="number" id="filaCancelar" min="1" style="width:80px;">
+  <button onclick="marcarCancelada()">Marcar CANCELADA</button>
+  <button onclick="deshacerCancelado()">Deshacer CANCELADO</button>
+</div>
+
+<button onclick="generarYCopiar()">Generar tabla elegante y copiar al portapapeles</button>
+
+<div id="contenedorTabla"></div>
+
+<script>
+let modoPar = false;
+const buquesBase = ['Jaume I', 'Avemar Dos'];
+
+function generarPrimerasColumnas() {
+  const horas = ['']; // primera fila vacía
+  for (let h = 1; h <= 23; h += 2) horas.push(h + ':00');
+  return horas;
+}
+function generarTercerasColumnas() {
+  const horas = [];
+  for (let h = 1; h <= 23; h += 2) horas.push(h + ':00');
+  horas.push(''); // última fila vacía
+  return horas;
+}
+
+let horariosTarifa = generarPrimerasColumnas();
+let horariosTanger = generarTercerasColumnas();
+
+function construirFormulario() {
+  const cont = document.getElementById('formulario');
+  cont.innerHTML = '';
+  const len = Math.max(horariosTarifa.length, horariosTanger.length);
+  for (let i = 0; i < len; i++) {
+    const t1 = horariosTarifa[i] || '';
+    const t2 = horariosTanger[i] || '';
+    const buque = buquesBase[i % 2];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input id="t1_${i}" value="${t1}"></td>
+      <td><input value="${buque}" readonly></td>
+      <td><input id="t2_${i}" value="${t2}"></td>
+    `;
+    cont.appendChild(tr);
+  }
+}
+
+function alternarParImpar() {
+  modoPar = !modoPar;
+  horariosTanger = horariosTanger.map((h, i) => {
+    if (!h) return '';
+    let num = parseInt(h);
+    num = modoPar ? num + 1 : num - 1;
+    if (num <= 0 || num >= 24) num = 23;
+    if (i === horariosTanger.length - 1) return '';
+    return num + ':00';
+  });
+  construirFormulario();
+}
+
+function eliminarFila() {
+  const num = parseInt(document.getElementById('filaEliminar').value, 10);
+  if (isNaN(num) || num < 1 || num >= horariosTarifa.length) {
+    alert('Número de fila no válido');
+    return;
+  }
+  horariosTarifa.splice(num, 1);
+  horariosTanger.splice(num, 1);
+  construirFormulario();
+}
+
+function marcarCancelada() {
+  const num = parseInt(document.getElementById('filaCancelar').value, 10);
+  if (isNaN(num) || num < 1 || num >= horariosTarifa.length) {
+    alert('Número de fila no válido');
+    return;
+  }
+  const t1 = document.getElementById(`t1_${num}`);
+  const t2 = document.getElementById(`t2_${num}`);
+  if (t1 && !/CANCELADO/i.test(t1.value)) t1.value += (t1.value ? ' ' : '') + 'CANCELADO';
+  if (t2 && !/CANCELADO/i.test(t2.value)) t2.value += (t2.value ? ' ' : '') + 'CANCELADO';
+}
+
+function deshacerCancelado() {
+  const num = parseInt(document.getElementById('filaCancelar').value, 10);
+  if (isNaN(num) || num < 1 || num >= horariosTarifa.length) {
+    alert('Número de fila no válido');
+    return;
+  }
+  const t1 = document.getElementById(`t1_${num}`);
+  const t2 = document.getElementById(`t2_${num}`);
+  if (t1) t1.value = t1.value.replace(/\s*CANCELADO/gi, '');
+  if (t2) t2.value = t2.value.replace(/\s*CANCELADO/gi, '');
+}
+
+function generarYCopiar() {
+  let html = `<table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">`;
+  html += `
+    <tr style="background-color: #408285; color: white; text-align: center;">
+      <th style="border: 1px solid #333; padding: 6px 10px;">Tarifa - Tánger</th>
+      <th style="border: 1px solid #333; padding: 6px 10px;">Buque</th>
+      <th style="border: 1px solid #333; padding: 6px 10px;">Tánger - Tarifa</th>
+    </tr>
+  `;
+  const len = Math.max(horariosTarifa.length, horariosTanger.length);
+  for (let i = 0; i < len; i++) {
+    let t1 = document.getElementById(`t1_${i}`)?.value || '';
+    let t2 = document.getElementById(`t2_${i}`)?.value || '';
+    if (t2 === '0:00' || t2 === '24:00') t2 = '23:59';
+    if (i === horariosTanger.length - 1) t2 = '';
+
+    const buque = buquesBase[i % 2];
+    const bgColor = i % 2 === 0 ? '#f9f9f9' : '#ffffff';
+
+    html += `
+      <tr style="background-color: ${bgColor}; text-align: center;">
+        <td style="border: 1px solid #333; padding: 6px 10px;">${t1}</td>
+        <td style="border: 1px solid #333; padding: 6px 10px;">${buque}</td>
+        <td style="border: 1px solid #333; padding: 6px 10px;">${t2}</td>
+      </tr>
+    `;
+  }
+  html += '</table>';
+
+  const cont = document.getElementById('contenedorTabla');
+  cont.innerHTML = html;
+
+  const tabla = cont.querySelector('table');
+  const range = document.createRange();
+  range.selectNode(tabla);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  document.execCommand('copy');
+  sel.removeAllRanges();
+
+  alert('Tabla elegante copiada al portapapeles con formato');
+}
+
+construirFormulario();
+</script>
+
+</body>
+</html>
