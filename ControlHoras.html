@@ -468,7 +468,7 @@ body {
       <select id="buque">
         <option value="">Selecciona un buque</option>
         <option value="Avemar Dos">Avemar Dos</option>
-        <option value="Jaume I">Jaume I</option>
+        <option value="Cecilia Payne">Cecilia Payne</option>
       </select>
 
       <select id="horaSalida">
@@ -491,15 +491,15 @@ body {
 
     <div class="dropdown-container">
       <select id="PAX"></select>
-      <select id="BEBES"></select>
-      <select id="CHF"></select>
+      <!-- <select id="BEBES"></select> -->
+      <!--<select id="CHF"></select> -->
       <select id="VEH"></select>
       <select id="FURG"></select>
       <select id="CRV"></select>
       <select id="MOT"></select>
       <select id="REM"></select>
       <select id="BUS"></select>
-      <select id="OTROS"></select>
+      <select id="BUGGIES"></select>
     </div>
 <div class="separator"></div>
 <div style="margin-top: 15px; font-size: 1.1rem; font-weight: bold; color: #408285;">
@@ -507,7 +507,7 @@ body {
 </div>
 <div class="dropdownBis-container">
       <select id="PASAJEROS"></select>
-      <select id="BEBE"></select>
+      <!-- <select id="BEBE"></select> -->
     </div>
 
 <div class="separator"></div>
@@ -524,10 +524,10 @@ body {
       <tr>
         <th>P.Aut</th>
         <th>P.Pas</th>
-        <th>Beb.Aut</th>
-        <th>Beb.Pas</th>
+        <!-- <th>Beb.Aut</th> 
+        <th>Beb.Pas</th> -->
         <th>Total PAX</th>
-        <th>Total Bebés</th>
+        <!-- <th>Total Bebés</th> -->
       </tr>
     </thead>
     <tbody>
@@ -542,13 +542,14 @@ body {
   <table id="tablaResumen2">
     <thead>
       <tr>
-        <th>Ch</th>
+        <!-- <th>Ch</th> -->
         <th>Vh</th>
         <th>Fr</th>
         <th>Cv</th>
         <th>Mt</th>
         <th>Rm</th>
         <th>Bus</th>
+        <th>Bg</th>
       </tr>
     </thead>
     <tbody>
@@ -607,7 +608,7 @@ function llenarSelect(id) {
 }
 
     // Llenamos todos los selects
-    const selectIds = ["PAX", "BEBES", "CHF", "VEH", "FURG", "CRV", "MOT", "REM", "BUS", "OTROS","PASAJEROS","BEBE"];
+    const selectIds = ["PAX", "VEH", "FURG", "CRV", "MOT", "REM", "BUS", "BUGGIES","PASAJEROS"];
     selectIds.forEach(id => llenarSelect(id));
 
     const botonesContainer = document.getElementById('buttonsContainer');
@@ -685,17 +686,21 @@ function llenarSelect(id) {
       sheet[`H${fila}`] = { v: buque, t: 's' };
       sheet[`I${fila}`] = { v: horaSalida, t: 's' };
 
+      //Ahora escribimos la hora registrada en el label de los botones
+      btn.textContent = `${nombresBotones[index]} (${hora})`;
+
+
 // Obtener los valores de las listas "PAX", "PASAJEROS", "BEBES" y "BEBE"
   const paxValue = parseInt(document.getElementById('PAX').value || 0);
   const pasajerosValue = parseInt(document.getElementById('PASAJEROS').value || 0);
-  const bebesValue = parseInt(document.getElementById('BEBES').value || 0);
-  const bebeValue = parseInt(document.getElementById('BEBE').value || 0);
+  //const bebesValue = parseInt(document.getElementById('BEBES').value || 0);
+  //const bebeValue = parseInt(document.getElementById('BEBE').value || 0);
 
   // Sumar "PAX" + "PASAJEROS" y "BEBES" + "BEBE"
   const totalPax = paxValue + pasajerosValue;
-  const totalBebes = bebesValue + bebeValue;
+  //const totalBebes = bebesValue + bebeValue;
 
-  const columnasPasajeros = ["J", "K", "L", "M", "N", "O", "P", "Q", "R", "S","T","U"];
+  const columnasPasajeros = ["J", "K", "L", "M", "N", "O", "P", "Q", "R", "S"];
 selectIds.forEach((id, idx) => {
   const valor = document.getElementById(id).value || 0;
   const col = columnasPasajeros[idx];
@@ -720,14 +725,14 @@ function actualizarValoresDesplegables() {
 
   // Buscar última fila ocupada (lo más abajo que haya algo en la columna A por ejemplo)
   let fila = 2;
-  while (sheet[`A${fila}`] && sheet[`A${fila}`].v !== "") {
+  while (sheet[`J${fila}`] && sheet[`J${fila}`].v !== "") {
     fila++;
   }
   fila--; // retroceder 1 porque la última comprobada estaba vacía
 
   if (fila < 2) return; // si no hay datos, no hacemos nada
 
-  const columnasPasajeros = ["J", "K", "L", "M", "N", "O", "P", "Q", "R", "S","T","U"];
+  const columnasPasajeros = ["J", "K", "L", "M", "N", "O", "P", "Q", "R", "S"];
   selectIds.forEach((id, idx) => {
     const valor = document.getElementById(id).value || 0;
     const col = columnasPasajeros[idx];
@@ -794,32 +799,32 @@ function actualizarResumen() {
   // Obtiene valores
   const pax = parseInt(document.getElementById("PAX").value || 0);
   const pasajeros = parseInt(document.getElementById("PASAJEROS").value || 0);
-  const bebes = parseInt(document.getElementById("BEBES").value || 0);
-  const bebe = parseInt(document.getElementById("BEBE").value || 0);
+  //const bebes = parseInt(document.getElementById("BEBES").value || 0);
+  //const bebe = parseInt(document.getElementById("BEBE").value || 0);
 
   // Construye arreglo con orden personalizado:
   // [PAX, PASAJEROS, Beb.Aut, Beb.Pas, Total PAX, Total Bebés]
   const datosFila1 = [
     pax,
     pasajeros,
-    bebes,
-    bebe,
+    //bebes,
+    //bebe,
     pax + pasajeros,
-    bebes + bebe
+    //bebes + bebe
   ];
 
   datosFila1.forEach((valor,index) => {
     const td = document.createElement("td");
     td.textContent = valor;
 
-if (index === 4 || index === 5) {       //Para resaltar las columnas de los totales
+if (index === 2 || index === 3) {       //Para resaltar las columnas de los totales
   td.classList.add("columna-total");
 }
     fila1.appendChild(td);
   });
 
   // Fila 2: CHF, VEH, FURG, CRV, MOT, REM, BUS
-  const otrosIds = ["CHF", "VEH", "FURG", "CRV", "MOT", "REM", "BUS"];
+  const otrosIds = ["VEH", "FURG", "CRV", "MOT", "REM", "BUS" , "BUGGIES"];
   otrosIds.forEach(id => {
   const valor = parseInt(document.getElementById(id).value || 0);
   const td = document.createElement("td");
@@ -831,7 +836,7 @@ if (index === 4 || index === 5) {       //Para resaltar las columnas de los tota
 }
 
 // Asigna el evento a cada select para que actualice el resumen al cambiar
-const selectIdsResumen = ["PAX", "PASAJEROS", "BEBES", "BEBE", "CHF", "VEH", "FURG", "CRV", "MOT", "REM", "BUS"];
+const selectIdsResumen = ["PAX", "PASAJEROS", "VEH", "FURG", "CRV", "MOT", "REM", "BUS" , "Bg"];
 selectIdsResumen.forEach(id => {
   const sel = document.getElementById(id);
   if (sel) sel.addEventListener("change", actualizarResumen);
@@ -849,7 +854,7 @@ const display = document.getElementById("display");
     let nuevaEntrada = true; // bandera
 
     // Crear botones numéricos del 1 al 9
-    for (let i = 1; i <= 9; i++) {
+    for (let i = 1; i <= 7; i++) {
       crearBoton(i);
     }
 
@@ -906,20 +911,8 @@ const display = document.getElementById("display");
 </script>
 
 <footer style="text-align: center; font-size: 0.85rem; color: #666; margin-top: 40px; padding-bottom: 10px;">
-  © 2025 Adnane Bensliman. Todos los derechos reservados.<br>
+  © 2026 Adnane Bensliman. Todos los derechos reservados.<br>
 </footer>
 
 </body>
 </html>
-
-
-
-
-
-    
-  
-
-  
-
-  
-    
