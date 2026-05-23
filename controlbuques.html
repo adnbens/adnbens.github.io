@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Control de Buque</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f7f8;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #408285;
+      font-size: 2rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .select-group {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    select {
+      flex: 1;
+      min-width: 150px;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    .upload-download {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .upload-download button {
+      flex: 0 0 auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #408285;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .upload-download button:hover {
+      background-color: #326b6b;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    .buttons button {
+      flex: 1 1 calc(33.333% - 20px);
+      min-width: 100px;
+      margin: 5px;
+      padding: 15px;
+      font-size: 16px;
+      background-color: #408285;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .buttons button:hover {
+      background-color: #326b6b;
+    }
+
+    button.pulsado {
+      background-color: #4CAF50 !important; 
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .separator {
+      border-top: 2px solid #408285;
+      margin: 20px 0;
+    }
+
+    .dropdown-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dropdown-container select {
+      width: 120px;
+    }
+
+    @media (max-width: 768px) {
+      .select-group {
+        flex-direction: column;
+      }
+
+      select {
+        width: 100%;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+
+      .buttons button {
+        flex: 1 1 100%;
+      }
+
+      .upload-download {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .container {
+        padding: 20px;
+      }
+
+      .buttons button {
+        font-size: 14px;
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Control de Buque</h1>
+
+    <div class="select-group">
+      <select id="buque">
+        <option value="">Selecciona un buque</option>
+        <option value="Avemar Dos">Avemar Dos</option>
+        <option value="Jaume I">Jaume I</option>
+      </select>
+
+      <select id="horaSalida">
+        <option value="">Selecciona hora de salida</option>
+      </select>
+    </div>
+
+    <div class="upload-download">
+      <input type="file" id="fileInput" accept=".xlsx" />
+      <button id="uploadBtn">Subir Archivo</button>
+      <button id="downloadBtn">Descargar</button>
+    </div>
+
+    <div class="separator"></div>
+
+    <div class="dropdown-container">
+      <select id="PAX"></select>
+      <select id="BEBES"></select>
+      <select id="CHF"></select>
+      <select id="VEH"></select>
+      <select id="FURG"></select>
+      <select id="CRV"></select>
+      <select id="MOT"></select>
+      <select id="REM"></select>
+      <select id="BUS"></select>
+      <select id="OTROS"></select>
+    </div>
+
+    <div class="buttons" id="buttonsContainer"></div>
+  </div>
+
+  <script>
+    const horas = [];
+    for (let i = 0; i < 24; i++) {
+      const hora = i.toString().padStart(2, '0') + "h00";
+      horas.push(hora);
+    }
+
+    const horaSalidaSelect = document.getElementById('horaSalida');
+    horas.forEach(h => {
+      const option = document.createElement('option');
+      option.value = h;
+      option.textContent = h;
+      horaSalidaSelect.appendChild(option);
+    });
+
+    /// Función para llenar las listas de 0 a 200, con un valor por defecto
+function llenarSelect(id) {
+  const select = document.getElementById(id);
+
+  // Agregar opción por defecto con el mismo nombre que el id
+  const defaultOption = document.createElement('option');
+  defaultOption.value = "";
+  defaultOption.textContent = id;
+  defaultOption.disabled = true;
+  defaultOption.selected = true;
+  select.appendChild(defaultOption);
+
+  // Luego agregar los números del 0 al 200
+  for (let i = 0; i <= 200; i++) {
+    const option = document.createElement('option');
+    option.value = i;
+    option.textContent = i;
+    select.appendChild(option);
+  }
+}
+
+
+    // Llenar todos los selects
+    const selectIds = ["PAX", "BEBES", "CHF", "VEH", "FURG", "CRV", "MOT", "REM", "BUS", "OTROS"];
+    selectIds.forEach(id => llenarSelect(id));
+
+    const botonesContainer = document.getElementById('buttonsContainer');
+    let workbook;
+    let fileName = '';
+    let pasosRealizados = [];
+
+    const nombresBotones = ["P. Estacha", "U. Estacha", "Bajada", "Fin Descarga", "Fin Carga", "Subida"];
+
+    for (let i = 0; i < nombresBotones.length; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = nombresBotones[i];
+      btn.onclick = () => escribirHora(i, btn);
+      botonesContainer.appendChild(btn);
+    }
+
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        workbook = XLSX.read(data, { type: 'array' });
+        fileName = document.getElementById('fileInput').files[0].name;
+        pasosRealizados = [];
+        document.querySelectorAll('.buttons button').forEach(btn => btn.classList.remove('pulsado'));
+      };
+      reader.readAsArrayBuffer(e.target.files[0]);
+    });
+
+    document.getElementById('uploadBtn').addEventListener('click', function() {
+      document.getElementById('fileInput').click();
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', descargarArchivo);
+
+    function escribirHora(index, btn) {
+      if (!workbook) {
+        alert("Primero carga un archivo.");
+        return;
+      }
+
+      if (pasosRealizados.length !== index) {
+        alert(`Debes pulsar primero el botón ${pasosRealizados.length + 1}`);
+        return;
+      }
+
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const now = new Date();
+      const hora = now.getHours() + ':' + 
+             now.getMinutes().toString().padStart(2, '0') + ':' + 
+             now.getSeconds().toString().padStart(2, '0');
+
+      const fecha = now.toLocaleDateString();
+      const buque = document.getElementById('buque').value;
+      const horaSalida = document.getElementById('horaSalida').value;
+
+      if (!buque || !horaSalida) {
+        alert("Selecciona el Buque y la Hora de Salida antes de registrar.");
+        return;
+      }
+
+      const colLetter = String.fromCharCode(65 + index); 
+      let fila = 2;
+
+      while (sheet[`${colLetter}${fila}`] && sheet[`${colLetter}${fila}`].v !== "") {
+        fila++;
+      }
+
+      const celdaHora = `${colLetter}${fila}`;
+      sheet[celdaHora] = { v: hora, t: 's' };
+      sheet[`G${fila}`] = { v: fecha, t: 's' };
+      sheet[`H${fila}`] = { v: buque, t: 's' };
+      sheet[`I${fila}`] = { v: horaSalida, t: 's' };
+      const columnasPasajeros = ["J", "K", "L", "M", "N", "O", "P", "Q", "R", "S"];
+selectIds.forEach((id, idx) => {
+  const valor = document.getElementById(id).value || 0;
+  const col = columnasPasajeros[idx];
+  sheet[`${col}${fila}`] = { v: parseInt(valor), t: 'n' };
+});
+
+
+      const ref = XLSX.utils.decode_range(sheet['!ref'] || "A1:S2");
+      if (ref.e.c < 8) ref.e.c = 8;
+      if (fila - 1 > ref.e.r) ref.e.r = fila - 1;
+      sheet['!ref'] = XLSX.utils.encode_range(ref);
+
+      pasosRealizados.push(index);
+      btn.classList.add("pulsado");
+    }
+
+    function descargarArchivo() {
+      if (!workbook) {
+        alert("Primero carga un archivo.");
+        return;
+      }
+
+      const buque = document.getElementById('buque').value;
+      const now = new Date();
+      const fecha = now.toLocaleDateString().split('/').reverse().join('-');
+      const hora = now.getHours().toString().padStart(2, '0') + '-' +
+                   now.getMinutes().toString().padStart(2, '0') + '-' +
+                   now.getSeconds().toString().padStart(2, '0');
+      const nuevoNombre = `${buque}_${fecha}_${hora}.xlsx`;
+
+      const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([wbout], { type: "application/octet-stream" });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = nuevoNombre;
+      link.click();
+    }
+  </script>
+</body>
+</html>
