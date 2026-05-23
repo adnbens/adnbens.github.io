@@ -166,7 +166,7 @@
       <select id="buque">
         <option value="">Selecciona un buque</option>
         <option value="Avemar Dos">Avemar Dos</option>
-        <option value="Jaume I">Jaume I</option>
+        <option value="Jaume I">Cecilia Payne I</option>
       </select>
 
       <select id="horaSalida">
@@ -192,7 +192,7 @@
       <select id="MOT"></select>
       <select id="REM"></select>
       <select id="BUS"></select>
-      <select id="OTROS"></select>
+      <select id="BUGGIES"></select>
     </div>
 
     <div class="buttons" id="buttonsContainer"></div>
@@ -236,7 +236,7 @@ function llenarSelect(id) {
 
 
     // Llenar todos los selects
-    const selectIds = ["PAX", "BEBES", "CHF", "VEH", "FURG", "CRV", "MOT", "REM", "BUS", "OTROS"];
+    const selectIds = ["PAX", "BEBES", "CHF", "VEH", "FURG", "CRV", "MOT", "REM", "BUS", "BUGGIES"];
     selectIds.forEach(id => llenarSelect(id));
 
     const botonesContainer = document.getElementById('buttonsContainer');
@@ -244,7 +244,7 @@ function llenarSelect(id) {
     let fileName = '';
     let pasosRealizados = [];
 
-    const nombresBotones = ["P. Estacha", "U. Estacha", "Bajada", "Fin Descarga", "Fin Carga", "Subida"];
+    const nombresBotones = ["P. Cabo", "Bajada", "F. Descarga", "Fin Carga", "Subida", "Libre de cabos"];
 
     for (let i = 0; i < nombresBotones.length; i++) {
       const btn = document.createElement('button');
